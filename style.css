@@ -1,8 +1,151 @@
-/* Payment Tabs */
+/* =========================================
+   1. استایل‌های اصلی و قبلی (حفظ شده)
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.landing-container, .login-container, .dashboard-container, .payment-container {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+h1, h2, h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn-primary, .btn-secondary, .btn-payment {
+    padding: 12px 30px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+.btn-payment {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    display: block;
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-payment:hover {
+    background: #45a049;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.servers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.server-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+}
+
+.server-card h4 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.invoice {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: left;
+    border: 1px solid #e9ecef;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 30px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 1px solid #c3e6cb;
+}
+
+#message {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* =========================================
+   2. استایل‌های جدید صفحه پرداخت (Payment)
+   ========================================= */
+
+/* تب‌های روش پرداخت */
 .payment-tabs {
     display: flex;
     gap: 10px;
-    margin: 20px 0;
+    margin: 25px 0;
     flex-wrap: wrap;
 }
 
@@ -17,6 +160,7 @@
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s;
+    color: #333;
 }
 
 .tab-btn.active {
@@ -29,10 +173,11 @@
     background: #e0e0e0;
 }
 
-/* Payment Sections */
+/* بخش‌های فرم پرداخت */
 .payment-section {
     display: none;
-    animation: fadeIn 0.3s;
+    animation: fadeIn 0.3s ease-in-out;
+    text-align: left;
 }
 
 .payment-section.active {
@@ -48,33 +193,24 @@
     color: #666;
     font-size: 14px;
     margin-bottom: 20px;
+    margin-top: -10px;
 }
 
-/* Form Styles */
+/* چیدمان فرم‌ها */
 .form-group {
     margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     font-weight: 600;
     color: #333;
     font-size: 14px;
 }
 
 .form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.3s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: #667eea;
+    margin: 0; /* بازنویسی مارجین پیش‌فرض input */
 }
 
 .form-row {
@@ -95,13 +231,15 @@
 }
 
 .card-icons span {
-    background: #f0f0f0;
-    padding: 3px 8px;
+    background: #fff;
+    padding: 4px 8px;
     border-radius: 4px;
     font-weight: bold;
+    border: 1px solid #ddd;
+    font-size: 11px;
 }
 
-/* Pay Button */
+/* دکمه‌های پرداخت فرم */
 .btn-pay {
     width: 100%;
     padding: 15px;
@@ -112,7 +250,7 @@
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     margin-top: 10px;
 }
 
@@ -122,14 +260,14 @@
 }
 
 .btn-paypal {
-    background: linear-gradient(135deg, #0070ba 0%, #003087 100%);
+    background: linear-gradient(135deg, #0070ba 0%, #003087 100%) !important;
 }
 
 .btn-crypto-pay {
-    background: linear-gradient(135deg, #f7931a 0%, #ff9500 100%);
+    background: linear-gradient(135deg, #f7931a 0%, #ff9500 100%) !important;
 }
 
-/* Crypto Networks */
+/* انتخاب شبکه کریپتو */
 .crypto-networks {
     display: grid;
     gap: 10px;
@@ -138,7 +276,7 @@
 
 .btn-crypto {
     background: white;
-    border: 2px solid #ddd;
+    border: 2px solid #e0e0e0;
     padding: 15px;
     border-radius: 8px;
     cursor: pointer;
@@ -147,6 +285,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #333;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
 }
 
 .btn-crypto:hover {
@@ -156,20 +298,38 @@
 
 .btn-crypto strong {
     color: #333;
+    font-size: 16px;
 }
 
 .btn-crypto small {
     color: #666;
     font-size: 12px;
+    font-weight: normal;
 }
 
-/* Wallet Info Box */
+.btn-back {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding: 0;
+    font-weight: 600;
+}
+
+.btn-back:hover {
+    text-decoration: underline;
+}
+
+/* جعبه اطلاعات کیف پول */
 .wallet-info-box {
     background: #f8f9ff;
     padding: 20px;
     border-radius: 10px;
     margin: 15px 0;
     border-left: 4px solid #667eea;
+    text-align: left;
 }
 
 .amount-box {
@@ -203,6 +363,8 @@
     flex: 1;
     word-break: break-all;
     font-size: 13px;
+    color: #333;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .btn-copy {
@@ -214,6 +376,7 @@
     cursor: pointer;
     font-size: 13px;
     white-space: nowrap;
+    transition: background 0.3s;
 }
 
 .btn-copy:hover {
@@ -227,40 +390,30 @@
     padding: 10px;
     border-radius: 6px;
     margin-top: 10px;
+    border: 1px solid #f5c6cb;
 }
 
-.btn-back {
-    background: none;
-    border: none;
-    color: #667eea;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 15px;
-    padding: 0;
-}
-
-.btn-back:hover {
-    text-decoration: underline;
-}
-
-/* Invoice Styles */
+/* به‌روزرسانی استایل فاکتور برای ساختار جدید */
 .invoice-row {
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.invoice-row:last-child {
+    border-bottom: none;
 }
 
 .invoice-row.total {
     font-size: 18px;
     color: #667eea;
     border-top: 2px solid #667eea;
-    border-bottom: none;
     margin-top: 10px;
     padding-top: 15px;
 }
 
-/* Error Message */
+/* پیام خطا */
 .error-message {
     background: #f8d7da;
     color: #721c24;
@@ -268,6 +421,8 @@
     border-radius: 10px;
     text-align: center;
     border: 1px solid #f5c6cb;
+    margin: 20px 0;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .error-message h3 {
@@ -275,8 +430,14 @@
     margin-bottom: 15px;
 }
 
-/* Responsive */
+/* =========================================
+   3. واکنش‌گرا (Responsive) برای موبایل
+   ========================================= */
 @media (max-width: 600px) {
+    .payment-container {
+        padding: 25px 20px;
+    }
+    
     .form-row {
         flex-direction: column;
         gap: 0;
@@ -288,5 +449,15 @@
     
     .tab-btn {
         width: 100%;
+    }
+    
+    .address-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-copy {
+        width: 100%;
+        margin-top: 10px;
     }
 }
