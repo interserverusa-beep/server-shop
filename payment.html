@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Server Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Payment Details</h2>
+        
+        <div class="invoice" id="invoice">
+            <!-- Invoice will be loaded here -->
+        </div>
+
+        <h3>Select Payment Method</h3>
+        <div class="payment-methods">
+            <button onclick="payWithCard()" class="btn-payment">
+                💳 Visa / Mastercard
+            </button>
+            <button onclick="payWithPaypal()" class="btn-payment">
+                🅿️ PayPal
+            </button>
+            <button onclick="showCryptoOptions()" class="btn-payment">
+                ₿ Cryptocurrency (USDT)
+            </button>
+        </div>
+
+        <div id="crypto-options" style="display: none;">
+            <h4>Select Network</h4>
+            <div class="crypto-networks">
+                <button onclick="payWithCrypto('TRC20')" class="btn-crypto">TRC20 (Tron)</button>
+                <button onclick="payWithCrypto('ERC20')" class="btn-crypto">ERC20 (Ethereum)</button>
+                <button onclick="payWithCrypto('BEP20')" class="btn-crypto">BEP20 (BSC)</button>
+            </div>
+        </div>
+
+        <div id="success-message" style="display: none;" class="success-message">
+            <h3>Thank you for your payment!</h3>
+            <p>The details of your purchased server have been sent to your email.</p>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load invoice
+        const server = JSON.parse(sessionStorage.getItem('selected-server'));
+        const plan = sessionStorage.getItem('selected-plan');
+        const price = sessionStorage.getItem('selected-price');
+
+        document.getElementById('invoice').innerHTML = `
+            <p><strong>Server:</strong> ${server.name}</p>
+            <p><strong>Specifications:</strong> ${server.specs}</p>
+            <p><strong>Plan:</strong> ${plan}</p>
+            <p><strong>Amount:</strong> $${price} (≈ ${price} USDT)</p>
+        `;
+
+        function payWithCard() {
+            alert('Visa/Mastercard payment coming soon!');
+        }
+
+        function payWithPaypal() {
+            alert('PayPal payment coming soon!');
+        }
+
+        function showCryptoOptions() {
+            document.getElementById('crypto-options').style.display = 'block';
+        }
+
+        function payWithCrypto(network) {
+            // TODO: Replace with your actual wallet addresses
+            const walletAddresses = {
+                'TRC20': 'TYourTRC20AddressHere',
+                'ERC20': '0xYourERC20AddressHere',
+                'BEP20': '0xYourBEP20AddressHere'
+            };
+
+            const address = walletAddresses[network];
+            const amount = price; // USDT amount
+
+            // Create payment URL (you can use a payment gateway or just show the address)
+            const paymentInfo = `
+                Network: ${network}\n
+                Address: ${address}\n
+                Amount: ${amount} USDT\n\n
+                Please send exactly ${amount} USDT to the address above.
+            `;
+
+            alert(paymentInfo);
+            
+            // Show success message after "payment"
+            setTimeout(() => {
+                document.querySelector('.payment-container').innerHTML = `
+                    <div class="success-message">
+                        <h3>Thank you for your payment!</h3>
+                        <p>The details of your purchased server have been sent to your email.</p>
+                    </div>
+                `;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
