@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Server Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h2>Welcome, <span id="user-email"></span></h2>
+            <button onclick="logout()" class="btn-secondary">Logout</button>
+        </div>
+
+        <h3>Available Servers</h3>
+        <div class="servers-grid" id="servers-grid">
+            <!-- Servers will be loaded here -->
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('user-email').textContent = user.email;
+                loadServers();
+            }
+        });
+
+        // Sample servers data (you can move this to Firebase later)
+        const servers = [
+            { id: 1, name: 'Basic Server', specs: '2 CPU, 4GB RAM, 50GB SSD', prices: { '1month': 10, '6months': 55, '1year': 100 } },
+            { id: 2, name: 'Pro Server', specs: '4 CPU, 8GB RAM, 100GB SSD', prices: { '1month': 20, '6months': 110, '1year': 200 } },
+            { id: 3, name: 'Enterprise Server', specs: '8 CPU, 16GB RAM, 500GB SSD', prices: { '1month': 50, '6months': 275, '1year': 500 } }
+        ];
+
+        function loadServers() {
+            const grid = document.getElementById('servers-grid');
+            grid.innerHTML = servers.map(server => `
+                <div class="server-card">
+                    <h4>${server.name}</h4>
+                    <p>${server.specs}</p>
+                    <select id="plan-${server.id}" onchange="selectPlan(${server.id})">
+                        <option value="">Select Plan</option>
+                        <option value="1month">1 Month - $${server.prices['1month']}</option>
+                        <option value="6months">6 Months - $${server.prices['6months']}</option>
+                        <option value="1year">1 Year - $${server.prices['1year']}</option>
+                    </select>
+                    <button onclick="proceedToPayment(${server.id})" class="btn-primary">Proceed to Payment</button>
+                </div>
+            `).join('');
+        }
+
+        function selectPlan(serverId) {
+            // Store selected plan in session
+            const plan = document.getElementById(`plan-${serverId}`).value;
+            sessionStorage.setItem(`selected-plan-${serverId}`, plan);
+        }
+
+        function proceedToPayment(serverId) {
+            const plan = document.getElementById(`plan-${serverId}`).value;
+            if (!plan) {
+                alert('Please select a plan');
+                return;
+            }
+            
+            const server = servers.find(s => s.id === serverId);
+            const price = server.prices[plan];
+            
+            sessionStorage.setItem('selected-server', JSON.stringify(server));
+            sessionStorage.setItem('selected-plan', plan);
+            sessionStorage.setItem('selected-price', price);
+            
+            window.location.href = 'payment.html';
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
+</body>
+</html>
