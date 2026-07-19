@@ -20,63 +20,82 @@
             <button class="dashboard-tab-btn active" data-tab="user-info">User Information</button>
             <button class="dashboard-tab-btn" data-tab="purchase-history">Purchase History</button>
             <button class="dashboard-tab-btn" data-tab="servers">Servers</button>
-            <button class="dashboard-tab-btn" data-tab="support">Support Ticket</button>
+            <button class="dashboard-tab-btn" data-tab="support">Support Tickets</button>
         </div>
 
-        <!-- Tab Content -->
+        <!-- User Information Tab -->
         <div id="user-info" class="tab-content active">
-            <h3>User Information</h3>
-            <div class="user-info-card">
+            <h3 class="dashboard-title">User Information</h3>
+            <p class="dashboard-subtitle">Your account details and information</p>
+            <div class="info-card">
                 <div class="info-item">
-                    <span class="info-label">Email:</span>
-                    <span class="info-value" id="user-email-display"></span>
+                    <strong>Email Address:</strong>
+                    <span id="user-email-display"></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Account Created:</span>
-                    <span class="info-value">July 15, 2023</span>
+                    <strong>Account Type:</strong>
+                    <span>Premium User</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Account Status:</span>
-                    <span class="info-value">Active</span>
+                    <strong>Account Created:</strong>
+                    <span>July 19, 2026</span>
+                </div>
+                <div class="info-item">
+                    <strong>Status:</strong>
+                    <span class="status-active">Active Account</span>
                 </div>
             </div>
         </div>
-        
+
+        <!-- Purchase History Tab -->
         <div id="purchase-history" class="tab-content">
-            <h3>Purchase History</h3>
-            <div class="history-empty">
-                <div class="empty-icon">🔍</div>
-                <p>No purchases recorded by you.</p>
-                <p class="empty-subtext">Your purchase history will appear here after making a server purchase.</p>
+            <h3 class="dashboard-title">Purchase History</h3>
+            <p class="dashboard-subtitle">Your previous server purchases</p>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h7v2zm0-4H7V7h7v2z" fill="#3498db"/>
+                    </svg>
+                </div>
+                <h4>No Purchases Recorded</h4>
+                <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
+                <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
             </div>
         </div>
-        
+
+        <!-- Servers Tab -->
         <div id="servers" class="tab-content">
-            <h3 style="font-family: 'Playfair Display', serif; color: #1a252f; font-size: 28px; margin-bottom: 10px;">Available Servers</h3>
-            <p style="color: #7f8c8d; margin-bottom: 40px;">Choose your perfect dedicated server configuration</p>
+            <h3 class="dashboard-title">Available Servers</h3>
+            <p class="dashboard-subtitle">Choose your perfect dedicated server configuration</p>
+            
             <div class="servers-grid" id="servers-grid">
                 <!-- Servers will be loaded here -->
             </div>
         </div>
-        
+
+        <!-- Support Tickets Tab -->
         <div id="support" class="tab-content">
-            <h3>Submit a Support Ticket</h3>
-            <form id="support-form">
-                <div class="form-group">
-                    <label for="ticket-subject">Subject</label>
-                    <input type="text" id="ticket-subject" placeholder="e.g., Billing Issue, Technical Problem" required>
-                </div>
-                <div class="form-group">
-                    <label for="ticket-message">Message</label>
-                    <textarea id="ticket-message" rows="5" placeholder="Please describe your issue in detail..." required></textarea>
-                </div>
-                <button type="submit" class="btn-primary">Submit Ticket</button>
-            </form>
-            <div id="ticket-success-message" style="display: none; margin-top: 30px;">
-                <div class="success-message">
-                    <h3>Ticket Submitted Successfully!</h3>
-                    <p>Your ticket number is: <strong id="ticket-number"></strong></p>
-                    <p>Ticket will be processed by support team. You'll receive a response via email.</p>
+            <h3 class="dashboard-title">Support Tickets</h3>
+            <p class="dashboard-subtitle">Submit a ticket for technical assistance</p>
+            
+            <div id="support-form-container">
+                <form id="support-form">
+                    <div class="form-group">
+                        <label for="ticket-subject">Subject</label>
+                        <input type="text" id="ticket-subject" placeholder="Brief description of your issue" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket-message">Message</label>
+                        <textarea id="ticket-message" rows="6" placeholder="Please describe your issue in detail..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Submit Ticket</button>
+                </form>
+                
+                <div id="support-success" class="success-message" style="display: none;">
+                    <h3>Ticket Submitted Successfully</h3>
+                    <p>Your ticket number is: <span id="ticket-number"></span></p>
+                    <p>Ticket has been sent to support team. They will respond via email.</p>
+                    <p class="highlight-text">Please keep this ticket number for future reference.</p>
                 </div>
             </div>
         </div>
@@ -97,41 +116,43 @@
         });
 
         // Tab switching functionality
-        document.querySelectorAll('.dashboard-tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove active class from all tabs and buttons
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Add active class to clicked tab and content
-                const tabName = button.getAttribute('data-tab');
-                document.getElementById(tabName).classList.add('active');
-                button.classList.add('active');
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
             });
-        });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update tab buttons
+            document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Find and activate the clicked tab button
+            document.querySelector(`.dashboard-tab-btn[data-tab="${tabId}"]`).classList.add('active');
+        }
 
-        // Support ticket form handling
+        // Support ticket submission
         document.getElementById('support-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Generate random ticket number
-            const ticketNumber = 'TICKET-' + Math.floor(100000 + Math.random() * 900000);
+            const ticketNumber = 'TICKET-' + Math.floor(10000 + Math.random() * 90000);
             
-            // Show success message
+            // Display success message
             document.getElementById('ticket-number').textContent = ticketNumber;
-            document.getElementById('ticket-success-message').style.display = 'block';
+            document.getElementById('support-success').style.display = 'block';
+            
+            // Reset form
+            document.getElementById('support-form').reset();
             
             // Scroll to success message
-            document.getElementById('ticket-success-message').scrollIntoView({ 
-                behavior: 'smooth' 
+            document.getElementById('support-success').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
             });
-            
-            // Clear form
-            this.reset();
         });
 
         // Sample servers data (matching the screenshot)
@@ -299,6 +320,16 @@
                 window.location.href = 'login.html';
             });
         }
+        
+        // Initialize tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to tab buttons
+            document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.getAttribute('data-tab'));
+                });
+            });
+        });
     </script>
 </body>
 </html>
