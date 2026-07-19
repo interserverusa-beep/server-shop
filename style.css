@@ -443,303 +443,179 @@ input:focus, select:focus {
 }
 
 /* =========================================
-   8. Dashboard Specific Styles (NEW)
+   8. Dashboard Tabs & Content
    ========================================= */
 
-/* Dashboard Container Override */
-.dashboard-container {
-    max-width: 1400px;
-    padding: 50px 40px;
-}
-
-.dashboard-top-bar {
+.dashboard-tabs {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    padding-bottom: 25px;
-    border-bottom: 2px solid #e0eafc;
+    gap: 0;
+    margin: 30px 0;
+    border-bottom: 2px solid #dfe6e9;
 }
 
-.dashboard-top-bar h2 {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 28px;
-    margin: 0;
-}
-
-.dashboard-top-bar h2 span {
-    color: #2c3e50;
-    font-weight: 700;
-}
-
-.dashboard-title {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.dashboard-subtitle {
-    color: #7f8c8d;
-    margin-bottom: 40px;
-    font-size: 15px;
-}
-
-.servers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
-}
-
-.server-card {
-    background: #ffffff;
-    border: 2px solid #e0eafc;
-    border-radius: 8px;
-    padding: 40px 30px;
-    text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(44, 62, 80, 0.06);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.server-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.12);
-    border-color: #3498db;
-}
-
-.server-card h4 {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 24px;
-    margin-bottom: 25px;
-    font-weight: 700;
-}
-
-.processor-logo {
-    width: 180px;
-    height: 80px;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.intel-logo {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #0068b5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.2;
-}
-
-.intel-logo .intel {
-    font-size: 32px;
-    border: 3px solid #0068b5;
-    border-radius: 50%;
-    width: 100px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 5px;
-}
-
-.intel-logo .xeon {
-    font-size: 24px;
-    letter-spacing: 2px;
-}
-
-.intel-logo .variant {
+.dashboard-tab-btn {
+    flex: 1;
+    padding: 14px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
     font-size: 14px;
-    color: #2c3e50;
-    margin-top: 5px;
-}
-
-.amd-logo {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 28px;
     font-weight: 700;
-    color: #0068b5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.2;
+    color: #7f8c8d;
+    transition: all 0.3s ease;
+    font-family: 'Lato', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.amd-logo .amd {
-    font-size: 18px;
-    color: #0068b5;
-    margin-bottom: 5px;
+.dashboard-tab-btn.active {
+    color: #2c3e50;
+    border-bottom-color: #2c3e50;
 }
 
-.amd-logo .ryzen {
-    font-size: 32px;
-    letter-spacing: 3px;
-    color: #0068b5;
+.dashboard-tab-btn:hover:not(.active) {
+    color: #34495e;
+    background: #f8f9fa;
 }
 
-.performance-score {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    padding: 15px 25px;
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* User Info Card */
+.user-info-card {
     background: #f8fafc;
+    padding: 30px;
     border-radius: 8px;
     border: 1px solid #e0eafc;
-}
-
-.score-icon {
-    width: 50px;
-    height: 50px;
-}
-
-.score-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: #3498db;
-}
-
-.score-number {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1a252f;
-    font-family: 'Playfair Display', serif;
-}
-
-.server-specs {
-    width: 100%;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 30px 0;
+    max-width: 600px;
+    margin: 0 auto;
     text-align: left;
 }
 
-.server-specs li {
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f4f8;
-    color: #2c3e50;
-    font-size: 15px;
+.info-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Lato', sans-serif;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f4f8;
 }
 
-.server-specs li:last-child {
+.info-item:last-child {
     border-bottom: none;
 }
 
-.server-specs li::before {
-    content: "✓";
-    color: #3498db;
-    font-weight: 700;
-    font-size: 16px;
-    width: 20px;
-}
-
-.spec-label {
-    font-weight: 600;
+.info-label {
     color: #34495e;
-    min-width: 140px;
+    font-weight: 600;
+    min-width: 160px;
+    font-family: 'Lato', sans-serif;
 }
 
-.spec-value {
+.info-value {
     color: #2c3e50;
     flex: 1;
 }
 
-.server-price {
-    margin: 20px 0;
-    padding: 20px;
+/* Purchase History Empty State */
+.history-empty {
+    text-align: center;
+    padding: 50px 20px;
     background: #f8fafc;
     border-radius: 8px;
-    border: 2px solid #e0eafc;
-    width: 100%;
+    border: 1px solid #e0eafc;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.price-label {
+.empty-icon {
+    font-size: 48px;
+    color: #bdc3c7;
+    margin-bottom: 20px;
+}
+
+.empty-subtext {
+    color: #7f8c8d;
     font-size: 14px;
-    color: #7f8c8d;
+    max-width: 400px;
+    margin: 10px auto 0;
+}
+
+/* Support Ticket Form */
+#support-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
     margin-bottom: 8px;
+    font-weight: 700;
+    color: #34495e;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.price-amount {
-    font-size: 36px;
-    font-weight: 700;
-    color: #2c3e50;
-    font-family: 'Playfair Display', serif;
-}
-
-.price-amount .currency {
-    font-size: 24px;
-    vertical-align: super;
-    margin-right: 5px;
-}
-
-.price-amount .period {
-    font-size: 16px;
-    color: #7f8c8d;
-    font-weight: 400;
-    margin-left: 5px;
-}
-
-.btn-configure {
-    width: 100%;
-    padding: 16px 28px;
-    background: #2980b9;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: auto;
-    font-family: 'Lato', sans-serif;
-}
-
-.btn-configure:hover {
-    background: #3498db;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(41, 128, 185, 0.3);
-}
-
-.plan-selector {
-    width: 100%;
-    margin: 20px 0;
-}
-
-.plan-selector select {
+.form-group input,
+.form-group textarea {
     width: 100%;
     padding: 14px;
     border: 1px solid #cbd5e0;
     background: #f8fafc;
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 15px;
     color: #2c3e50;
     font-family: 'Lato', sans-serif;
-    cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.plan-selector select:focus {
-    outline: none;
-    border-color: #3498db;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+.form-group textarea {
+    resize: vertical;
+}
+
+/* =========================================
+   9. Responsive
+   ========================================= */
+@media (max-width: 768px) {
+    .dashboard-tabs {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .dashboard-tab-btn {
+        border: 1px solid #d1d9e6;
+        border-radius: 4px;
+        text-align: center;
+    }
+    
+    .dashboard-tab-btn.active {
+        border-color: #2c3e50;
+        background: #f8fafc;
+    }
+    
+    .user-info-card,
+    .history-empty {
+        padding: 20px;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-label {
+        margin-bottom: 8px;
+        min-width: auto;
+    }
 }
 
 /* =========================================
