@@ -15,11 +15,70 @@
             <button onclick="logout()" class="btn-secondary">Logout</button>
         </div>
 
-        <h3 style="font-family: 'Playfair Display', serif; color: #1a252f; font-size: 28px; margin-bottom: 10px;">Available Servers</h3>
-        <p style="color: #7f8c8d; margin-bottom: 40px;">Choose your perfect dedicated server configuration</p>
+        <!-- Tab Navigation -->
+        <div class="dashboard-tabs">
+            <button class="dashboard-tab-btn active" data-tab="user-info">User Information</button>
+            <button class="dashboard-tab-btn" data-tab="purchase-history">Purchase History</button>
+            <button class="dashboard-tab-btn" data-tab="servers">Servers</button>
+            <button class="dashboard-tab-btn" data-tab="support">Support Ticket</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="user-info" class="tab-content active">
+            <h3>User Information</h3>
+            <div class="user-info-card">
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" id="user-email-display"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Account Created:</span>
+                    <span class="info-value">July 15, 2023</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Account Status:</span>
+                    <span class="info-value">Active</span>
+                </div>
+            </div>
+        </div>
         
-        <div class="servers-grid" id="servers-grid">
-            <!-- Servers will be loaded here -->
+        <div id="purchase-history" class="tab-content">
+            <h3>Purchase History</h3>
+            <div class="history-empty">
+                <div class="empty-icon">🔍</div>
+                <p>No purchases recorded by you.</p>
+                <p class="empty-subtext">Your purchase history will appear here after making a server purchase.</p>
+            </div>
+        </div>
+        
+        <div id="servers" class="tab-content">
+            <h3 style="font-family: 'Playfair Display', serif; color: #1a252f; font-size: 28px; margin-bottom: 10px;">Available Servers</h3>
+            <p style="color: #7f8c8d; margin-bottom: 40px;">Choose your perfect dedicated server configuration</p>
+            <div class="servers-grid" id="servers-grid">
+                <!-- Servers will be loaded here -->
+            </div>
+        </div>
+        
+        <div id="support" class="tab-content">
+            <h3>Submit a Support Ticket</h3>
+            <form id="support-form">
+                <div class="form-group">
+                    <label for="ticket-subject">Subject</label>
+                    <input type="text" id="ticket-subject" placeholder="e.g., Billing Issue, Technical Problem" required>
+                </div>
+                <div class="form-group">
+                    <label for="ticket-message">Message</label>
+                    <textarea id="ticket-message" rows="5" placeholder="Please describe your issue in detail..." required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Submit Ticket</button>
+            </form>
+            <div id="ticket-success-message" style="display: none; margin-top: 30px;">
+                <div class="success-message">
+                    <h3>Ticket Submitted Successfully!</h3>
+                    <p>Your ticket number is: <strong id="ticket-number"></strong></p>
+                    <p>Ticket will be processed by support team. You'll receive a response via email.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -30,9 +89,49 @@
             if (!user) {
                 window.location.href = 'login.html';
             } else {
-                document.getElementById('user-email').textContent = user.email;
+                const userEmail = user.email;
+                document.getElementById('user-email').textContent = userEmail;
+                document.getElementById('user-email-display').textContent = userEmail;
                 loadServers();
             }
+        });
+
+        // Tab switching functionality
+        document.querySelectorAll('.dashboard-tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all tabs and buttons
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab and content
+                const tabName = button.getAttribute('data-tab');
+                document.getElementById(tabName).classList.add('active');
+                button.classList.add('active');
+            });
+        });
+
+        // Support ticket form handling
+        document.getElementById('support-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Generate random ticket number
+            const ticketNumber = 'TICKET-' + Math.floor(100000 + Math.random() * 900000);
+            
+            // Show success message
+            document.getElementById('ticket-number').textContent = ticketNumber;
+            document.getElementById('ticket-success-message').style.display = 'block';
+            
+            // Scroll to success message
+            document.getElementById('ticket-success-message').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+            
+            // Clear form
+            this.reset();
         });
 
         // Sample servers data (matching the screenshot)
