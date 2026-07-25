@@ -12,125 +12,122 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Animated Logo -->
-        <div class="site-logo">
-            <img src="images/logo.png" alt="Server Shop Logo" class="logo-image">
-            <span class="logo-text">Server Shop</span>
-        </div>
-        
-        <div class="dashboard-top-bar">
-            <h2>Welcome, <span id="user-email"></span></h2>
-            <div class="top-bar-actions">
-                <button onclick="openChat()" class="btn-secondary"> Live Support Chat</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="images/logo.png" alt="Server Shop" class="logo-image">
+                <span class="logo-text">Server Shop</span>
+            </div>
+            
+            <nav class="main-nav">
+                <button class="nav-btn active" onclick="switchTab('servers')">Servers</button>
+                <button class="nav-btn" onclick="switchTab('live-support')">Live Support</button>
+                <button class="nav-btn" onclick="switchTab('purchase-history')">Purchase History</button>
+                <button class="nav-btn" onclick="switchTab('support-ticket')">Support Ticket</button>
+            </nav>
+            
+            <div class="header-actions">
+                <span id="user-email-display" class="user-email"></span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
             </div>
         </div>
+    </header>
 
-        <!-- Tab Navigation -->
-        <div class="dashboard-tabs">
-            <button class="dashboard-tab-btn active" data-tab="user-info">User Information</button>
-            <button class="dashboard-tab-btn" data-tab="purchase-history">Purchase History</button>
-            <button class="dashboard-tab-btn" data-tab="servers">Servers</button>
-            <button class="dashboard-tab-btn" data-tab="support">Support Tickets</button>
-        </div>
-
-        <!-- User Information Tab -->
-        <div id="user-info" class="tab-content active">
-            <h3 class="dashboard-title">User Information</h3>
-            <p class="dashboard-subtitle">Your account details and information</p>
-            <div class="info-card">
-                <div class="info-item">
-                    <strong>Email Address:</strong>
-                    <span id="user-email-display"></span>
-                </div>
-                <div class="info-item">
-                    <strong>Account Type:</strong>
-                    <span>Premium User</span>
-                </div>
-                <div class="info-item">
-                    <strong>Account Created:</strong>
-                    <span>July 19, 2026</span>
-                </div>
-                <div class="info-item">
-                    <strong>Status:</strong>
-                    <span class="status-active">Active Account</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Purchase History Tab -->
-        <div id="purchase-history" class="tab-content">
-            <h3 class="dashboard-title">Purchase History</h3>
-            <p class="dashboard-subtitle">Your previous server purchases</p>
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h7v2zm0-4H7V7h7v2z" fill="#3498db"/>
-                    </svg>
-                </div>
-                <h4>No Purchases Recorded</h4>
-                <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
-                <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
-            </div>
-        </div>
-
+    <!-- Main Content -->
+    <main class="main-content">
         <!-- Servers Tab -->
-        <div id="servers" class="tab-content">
-            <h3 class="dashboard-title">Available Servers</h3>
-            <p class="dashboard-subtitle">Choose your perfect dedicated server configuration</p>
+        <div id="servers" class="tab-content active">
+            <div class="page-header">
+                <h1>40GBPS Dedicated Servers</h1>
+                <p>InterServer delivers optimal performance with our 40Gbps servers, providing a balance of speed and reliability.</p>
+            </div>
             
             <div class="servers-grid" id="servers-grid">
                 <!-- Servers will be loaded here -->
             </div>
         </div>
 
-        <!-- Support Tickets Tab -->
-        <div id="support" class="tab-content">
-            <h3 class="dashboard-title">Support Tickets</h3>
-            <p class="dashboard-subtitle">Submit a ticket for technical assistance</p>
+        <!-- Live Support Tab -->
+        <div id="live-support" class="tab-content">
+            <div class="page-header">
+                <h1>💬 Live Support Chat</h1>
+                <p>Chat with our support team in real-time</p>
+            </div>
             
-            <div id="support-form-container">
-                <form id="support-form">
-                    <div class="form-group">
-                        <label for="ticket-subject">Subject</label>
-                        <input type="text" id="ticket-subject" placeholder="Brief description of your issue" required>
+            <div class="chat-container-main">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-message">
+                        <p>Welcome to our support chat! How can we help you today?</p>
                     </div>
-                    <div class="form-group">
-                        <label for="ticket-message">Message</label>
-                        <textarea id="ticket-message" rows="6" placeholder="Please describe your issue in detail..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary">Submit Ticket</button>
-                </form>
+                </div>
                 
-                <div id="support-success" class="success-message" style="display: none;">
-                    <h3>Ticket Submitted Successfully</h3>
-                    <p>Your ticket number is: <span id="ticket-number"></span></p>
-                    <p>Ticket has been sent to support team. They will respond via email.</p>
-                    <p class="highlight-text">Please keep this ticket number for future reference.</p>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
+                    <button onclick="sendMessage()" class="btn-send">Send</button>
                 </div>
             </div>
         </div>
 
-        <!-- Live Chat Modal -->
-        <div id="chat-modal" class="chat-modal" style="display: none;">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <h3>💬 Support Chat</h3>
-                    <button onclick="closeChat()" class="btn-close">×</button>
-                </div>
-                
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Messages will be loaded here -->
-                </div>
-                
-                <div class="chat-input">
-                    <input type="text" id="chat-message" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
-                    <button onclick="sendMessage()" class="btn-primary">Send</button>
+        <!-- Purchase History Tab -->
+        <div id="purchase-history" class="tab-content">
+            <div class="page-header">
+                <h1>📦 Purchase History</h1>
+                <p>View your server purchase history</p>
+            </div>
+            
+            <div class="orders-list" id="orders-list">
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <h3>No Orders Yet</h3>
+                    <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
+                    <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Support Ticket Tab -->
+        <div id="support-ticket" class="tab-content">
+            <div class="page-header">
+                <h1> Submit Support Ticket</h1>
+                <p>Create a ticket for technical assistance</p>
+            </div>
+            
+            <div class="ticket-form-container">
+                <form id="ticket-form" onsubmit="submitTicket(event)">
+                    <div class="form-group">
+                        <label for="ticket-subject">Subject *</label>
+                        <input type="text" id="ticket-subject" placeholder="Brief description of your issue" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-priority">Priority</label>
+                        <select id="ticket-priority">
+                            <option value="low">Low</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-message">Message *</label>
+                        <textarea id="ticket-message" rows="8" placeholder="Please describe your issue in detail..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit-ticket">Submit Ticket</button>
+                </form>
+                
+                <div id="ticket-success" class="success-message" style="display: none;">
+                    <div class="success-icon">✅</div>
+                    <h3>Ticket Submitted Successfully</h3>
+                    <p>Your ticket number is: <strong id="ticket-number"></strong></p>
+                    <p>Our support team will respond to you via email within 24 hours.</p>
+                    <button onclick="resetTicketForm()" class="btn-primary">Create Another Ticket</button>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script src="firebase-config.js"></script>
     <script>
@@ -143,87 +140,74 @@
                 window.location.href = 'login.html';
             } else {
                 currentUser = user;
-                document.getElementById('user-email').textContent = user.email;
                 document.getElementById('user-email-display').textContent = user.email;
                 loadServers();
+                loadOrders();
             }
         });
 
-        // Tab switching functionality
+        // Tab Switching
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
             });
+            
+            // Show selected tab
             document.getElementById(tabId).classList.add('active');
             
-            document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`.dashboard-tab-btn[data-tab="${tabId}"]`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load chat if switching to live support
+            if (tabId === 'live-support') {
+                loadChatMessages();
+            }
         }
 
-        // Support ticket submission
-        document.getElementById('support-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const ticketNumber = 'TICKET-' + Math.floor(10000 + Math.random() * 90000);
-            document.getElementById('ticket-number').textContent = ticketNumber;
-            document.getElementById('support-success').style.display = 'block';
-            document.getElementById('support-form').reset();
-            document.getElementById('support-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-
-        // Servers Data with Pricing
+        // Servers Data
         const servers = [
             { 
                 id: 1, 
-                name: '4 x Xeon Platinum 8173M',
+                name: '2 x Xeon Platinum 8173M',
                 processor: 'intel',
-                processorVariant: '4 X XEON',
+                variant: '2 X XEON',
                 score: 158145,
-                cores: '128 Cores 2 CPU',
-                memory: '256GB Memory',
+                cores: '56 Cores 2 CPU',
+                memory: '128GB Memory',
                 storage: '(12)HDD or (12)SSD or (2)NVMe',
-                network: '80gbps Unmetered',
+                network: '40gbps Unmetered',
                 features: ['IPMI Console', 'DDoS Protection'],
-                prices: { 
-                    '1month': 2487, 
-                    '6months': 13999, 
-                    '1year': 25999 
-                } 
+                prices: { '1month': 2487, '6months': 13999, '1year': 25999 } 
             },
             { 
                 id: 2, 
                 name: 'AMD RYZEN 9900X',
                 processor: 'amd',
-                processorVariant: '',
+                variant: '',
                 score: 127510,
                 cores: '12 Cores Single CPU',
-                memory: '128GB Memory',
+                memory: '64GB Memory',
                 storage: '(4)HDD or (4)SSD or (2)NVMe',
-                network: '60gbps Unmetered',
+                network: '40gbps Unmetered',
                 features: ['IPMI Console', 'DDoS Protection'],
-                prices: { 
-                    '1month': 2287, 
-                    '6months': 12999, 
-                    '1year': 24999 
-                } 
+                prices: { '1month': 2287, '6months': 12999, '1year': 24999 } 
             },
             { 
                 id: 3, 
                 name: '2 x Xeon Gold 6230R 8SFF',
                 processor: 'intel',
-                processorVariant: 'XEON GOLD',
+                variant: 'XEON GOLD',
                 score: 186318,
-                cores: '128 Cores 4 CPU',
+                cores: '52 Cores 2 CPU',
                 memory: '128GB Memory',
                 storage: '(8)SSD or (2)NVMe',
                 network: '40gbps Unmetered',
                 features: ['IPMI Console', 'DDoS Protection'],
-                prices: { 
-                    '1month': 2187, 
-                    '6months': 11999, 
-                    '1year': 23999 
-                } 
+                prices: { '1month': 2187, '6months': 11999, '1year': 23999 } 
             }
         ];
 
@@ -231,50 +215,31 @@
             const grid = document.getElementById('servers-grid');
             grid.innerHTML = servers.map(server => `
                 <div class="server-card">
-                    <h4>${server.name}</h4>
+                    <h2>${server.name}</h2>
                     
                     <div class="processor-logo">
-                        ${getProcessorLogo(server.processor, server.processorVariant)}
+                        ${getProcessorLogo(server.processor, server.variant)}
                     </div>
                     
-                    <div class="performance-score">
-                        <div class="score-icon">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                                <path d="M12 6c-3.31 0-6 2.69-6 6 0 1.66.67 3.16 1.76 4.24l.01.01c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41C8.34 13.99 8 13.04 8 12c0-2.21 1.79-4 4-4 .92 0 1.76.31 2.44.84l5.3-5.3c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-5.3 5.3C15.19 11.69 13.66 12 12 12z" opacity="0.3"/>
-                                <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                            </svg>
-                        </div>
-                        <div class="score-number">${server.score.toLocaleString()}</div>
+                    <div class="benchmark">
+                        <svg class="speed-icon" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        <span class="benchmark-score">${server.score.toLocaleString()}</span>
                     </div>
                     
-                    <ul class="server-specs">
-                        <li>
-                            <span class="spec-label">Processor:</span>
-                            <span class="spec-value">${server.cores}</span>
-                        </li>
-                        <li>
-                            <span class="spec-label">Memory:</span>
-                            <span class="spec-value">${server.memory}</span>
-                        </li>
-                        <li>
-                            <span class="spec-label">Storage:</span>
-                            <span class="spec-value">${server.storage}</span>
-                        </li>
-                        <li>
-                            <span class="spec-label">Network:</span>
-                            <span class="spec-value">${server.network}</span>
-                        </li>
-                        ${server.features.map(feature => `
-                        <li>
-                            <span class="spec-label">${feature}:</span>
-                            <span class="spec-value">Included</span>
-                        </li>
-                        `).join('')}
+                    <ul class="specs-list">
+                        <li><span class="spec-label">Processor:</span> <span class="spec-value">${server.cores}</span></li>
+                        <li><span class="spec-label">Memory:</span> <span class="spec-value">${server.memory}</span></li>
+                        <li><span class="spec-label">Storage:</span> <span class="spec-value">${server.storage}</span></li>
+                        <li><span class="spec-label">Network:</span> <span class="spec-value">${server.network}</span></li>
+                        <li><span class="spec-label">IPMI Console:</span> <span class="spec-value">Included</span></li>
+                        <li><span class="spec-label">DDoS Protection:</span> <span class="spec-value">Included</span></li>
                     </ul>
                     
                     <div class="plan-selector">
-                        <label class="plan-label">Select Plan Duration:</label>
+                        <label>Select Plan:</label>
                         <select id="plan-${server.id}" onchange="updatePrice(${server.id})">
                             <option value="1month">1 Month</option>
                             <option value="6months">6 Months</option>
@@ -282,19 +247,16 @@
                         </select>
                     </div>
                     
-                    <div class="server-price">
-                        <div class="price-label">Cost:</div>
-                        <div class="price-amount">
+                    <div class="price-display">
+                        <span class="price-label">Cost:</span>
+                        <span class="price-amount">
                             <span class="currency">$</span>
                             <span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span>
-                            <span class="period">/mo</span>
-                        </div>
-                        <div class="plan-duration" id="duration-${server.id}">Billed Monthly</div>
+                            <span class="period">.00 /mo</span>
+                        </span>
                     </div>
                     
-                    <button onclick="proceedToPayment(${server.id})" class="btn-configure">
-                        Configure Now!
-                    </button>
+                    <button onclick="configureServer(${server.id})" class="btn-configure">Configure Now!</button>
                 </div>
             `).join('');
         }
@@ -303,111 +265,84 @@
             if (processor === 'intel') {
                 return `
                     <div class="intel-logo">
-                        <div class="intel">intel</div>
-                        <div class="xeon">XEON</div>
-                        ${variant ? `<div class="variant">${variant}</div>` : ''}
+                        <div class="intel-circle">intel</div>
+                        <div class="xeon-text">XEON</div>
+                        ${variant ? `<div class="variant-text">${variant}</div>` : ''}
                     </div>
                 `;
-            } else if (processor === 'amd') {
+            } else {
                 return `
                     <div class="amd-logo">
-                        <div class="amd">AMD</div>
-                        <div class="ryzen">RYZEN</div>
+                        <div class="amd-text">AMD</div>
+                        <div class="ryzen-text">RYZEN</div>
                     </div>
                 `;
             }
-            return '';
         }
 
         function updatePrice(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
-            
-            if (plan && server) {
-                const price = server.prices[plan];
-                document.getElementById(`price-${serverId}`).textContent = price.toLocaleString();
-                
-                // Update duration text
-                let durationText = 'Billed Monthly';
-                if (plan === '6months') durationText = 'Billed Every 6 Months';
-                if (plan === '1year') durationText = 'Billed Annually';
-                document.getElementById(`duration-${serverId}`).textContent = durationText;
-                
-                sessionStorage.setItem(`selected-plan-${serverId}`, plan);
-            }
+            const price = server.prices[plan];
+            document.getElementById(`price-${serverId}`).textContent = price.toLocaleString();
         }
 
-        function proceedToPayment(serverId) {
+        function configureServer(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
-            
-            if (!plan || !server) {
-                alert('Please select a valid server and plan');
-                return;
-            }
-            
             const price = server.prices[plan];
             
-            // Store server info with plan details
-            sessionStorage.setItem('selected-server', JSON.stringify({
-                ...server,
-                selectedPlan: plan,
-                selectedPrice: price
-            }));
+            sessionStorage.setItem('selected-server', JSON.stringify(server));
             sessionStorage.setItem('selected-plan', plan);
             sessionStorage.setItem('selected-price', price);
             
             window.location.href = 'payment.html';
         }
 
-        function logout() {
-            auth.signOut().then(() => { window.location.href = 'login.html'; });
-        }
-
         // Live Chat Functions
-        function openChat() {
-            document.getElementById('chat-modal').style.display = 'flex';
-            loadChatMessages();
-        }
-
-        function closeChat() {
-            document.getElementById('chat-modal').style.display = 'none';
-            if (chatUnsubscribe) chatUnsubscribe();
-        }
-
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') sendMessage();
-        }
-
-        async function loadChatMessages() {
+        function loadChatMessages() {
             if (!currentUser) return;
             if (chatUnsubscribe) chatUnsubscribe();
 
             const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.innerHTML = '<p style="text-align: center; color: #666;">Loading messages...</p>';
+            messagesContainer.innerHTML = '<div class="loading">Loading messages...</div>';
 
             chatUnsubscribe = db.collection('chats').doc(currentUser.uid).collection('messages')
                 .orderBy('timestamp', 'asc')
+                .limit(50)
                 .onSnapshot((snapshot) => {
                     messagesContainer.innerHTML = '';
+                    
                     if (snapshot.empty) {
-                        messagesContainer.innerHTML = '<p style="text-align: center; color: #666;">No messages yet. Start the conversation!</p>';
+                        messagesContainer.innerHTML = `
+                            <div class="welcome-message">
+                                <p>Welcome to our support chat! How can we help you today?</p>
+                            </div>
+                        `;
                         return;
                     }
+
                     snapshot.forEach((doc) => {
                         const msg = doc.data();
                         const messageDiv = document.createElement('div');
                         messageDiv.className = `chat-message ${msg.sender}`;
-                        const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString() : '';
-                        messageDiv.innerHTML = `<div class="message-bubble">${msg.text}</div><div class="message-time">${time}</div>`;
+                        
+                        const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                        
+                        messageDiv.innerHTML = `
+                            <div class="message-bubble">${msg.text}</div>
+                            <div class="message-time">${time}</div>
+                        `;
+                        
                         messagesContainer.appendChild(messageDiv);
                     });
+
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 });
         }
 
         async function sendMessage() {
-            const input = document.getElementById('chat-message');
+            const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text || !currentUser) return;
 
@@ -424,21 +359,115 @@
                     text: text,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
                 input.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
                 alert('Failed to send message');
             }
         }
-        
-        // Initialize tab functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    switchTab(this.getAttribute('data-tab'));
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Support Ticket Functions
+        async function submitTicket(event) {
+            event.preventDefault();
+            
+            const subject = document.getElementById('ticket-subject').value;
+            const priority = document.getElementById('ticket-priority').value;
+            const message = document.getElementById('ticket-message').value;
+            
+            if (!currentUser) return;
+            
+            try {
+                const ticketNumber = 'TICKET-' + Math.floor(100000 + Math.random() * 900000);
+                
+                await db.collection('tickets').add({
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    ticketNumber: ticketNumber,
+                    subject: subject,
+                    priority: priority,
+                    message: message,
+                    status: 'open',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
+                document.getElementById('ticket-number').textContent = ticketNumber;
+                document.getElementById('ticket-form').style.display = 'none';
+                document.getElementById('ticket-success').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error submitting ticket:', error);
+                alert('Failed to submit ticket. Please try again.');
+            }
+        }
+
+        function resetTicketForm() {
+            document.getElementById('ticket-form').reset();
+            document.getElementById('ticket-form').style.display = 'block';
+            document.getElementById('ticket-success').style.display = 'none';
+        }
+
+        // Load Orders
+        async function loadOrders() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('orders')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                const ordersList = document.getElementById('orders-list');
+                
+                if (snapshot.empty) {
+                    ordersList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <h3>No Orders Yet</h3>
+                            <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
+                            <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                ordersList.innerHTML = snapshot.docs.map(doc => {
+                    const order = doc.data();
+                    const date = order.timestamp ? order.timestamp.toDate().toLocaleDateString() : 'N/A';
+                    
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <h3>${order.serverName || 'Server Order'}</h3>
+                                <span class="order-status ${order.status}">${order.status || 'pending'}</span>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Plan:</strong> ${order.plan || 'N/A'}</p>
+                                <p><strong>Price:</strong> $${order.price ? order.price.toLocaleString() : '0'}</p>
+                                <p><strong>Network:</strong> ${order.network || 'N/A'}</p>
+                                <p><strong>Date:</strong> ${date}</p>
+                                ${order.transactionHash ? `<p><strong>TX Hash:</strong> <code>${order.transactionHash}</code></p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
             });
-        });
+        }
     </script>
 </body>
-</html>پ
+</html>
