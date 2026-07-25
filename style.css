@@ -3,17 +3,16 @@
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@600;700&display=swap');
 
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    font-family: 'Lato', 'Segoe UI', sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
+    font-family: 'Lato', 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
     color: #2c3e50;
     min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
 }
 
@@ -48,6 +47,7 @@ input, select, textarea {
     border-radius: 4px;
     font-size: 15px;
     color: #2c3e50;
+    font-family: 'Lato', sans-serif;
     transition: all 0.3s ease;
 }
 
@@ -58,10 +58,7 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(0, 112, 204, 0.1);
 }
 
-textarea { 
-    min-height: 120px; 
-    resize: vertical; 
-}
+textarea { min-height: 120px; resize: vertical; }
 
 .btn-primary, .btn-secondary, .btn-pay, .btn-configure, .btn-send, .btn-submit-ticket {
     padding: 14px 28px;
@@ -72,6 +69,7 @@ textarea {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: 'Lato', sans-serif;
 }
 
 .btn-primary, .btn-pay, .btn-configure, .btn-send, .btn-submit-ticket {
@@ -90,12 +88,10 @@ textarea {
     color: #2c3e50;
     border: 1px solid #bdc3c7;
 }
-.btn-secondary:hover { 
-    background: #dfe6e9; 
-}
+.btn-secondary:hover { background: #dfe6e9; }
 
 /* =========================================
-   3. Dashboard Layout & Header (FIXED)
+   3. Dashboard Layout & Header
    ========================================= */
 .site-header {
     background: #ffffff;
@@ -113,10 +109,10 @@ textarea {
     margin: 0 auto;
     padding: 0 30px;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 15px;
+    flex-wrap: wrap;
 }
 
 .logo { 
@@ -135,6 +131,7 @@ textarea {
     font-size: 28px;
     font-weight: 700;
     color: #1a3a5c;
+    white-space: nowrap;
 }
 
 .main-nav { 
@@ -195,9 +192,9 @@ textarea {
     max-width: 1400px;
     margin: 0 auto;
     padding: 40px 30px;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 100px);
     width: 100%;
-    position: relative;
+    margin-top: 100px; /* Added to push content below header */
 }
 
 .page-header { 
@@ -217,12 +214,11 @@ textarea {
 }
 
 /* =========================================
-   4. Tabs System (FIXED)
+   4. Tabs System
    ========================================= */
 .tab-content { 
     display: none; 
-    animation: fadeIn 0.4s ease-in-out;
-    margin-top: 20px;
+    animation: fadeIn 0.4s ease-in-out; 
 }
 .tab-content.active { 
     display: block; 
@@ -428,8 +424,6 @@ textarea {
     font-size: 14px; 
     color: #1a3a5c; 
     font-weight: 500; 
-    display: inline-block;
-    margin-left: 5px;
 }
 
 .btn-configure { 
@@ -576,7 +570,178 @@ textarea {
 }
 
 /* =========================================
-   8. Responsive Design (FIXED)
+   7. Payment Page Specifics
+   ========================================= */
+.payment-tabs { 
+    display: flex; 
+    gap: 0; 
+    margin: 30px 0; 
+    border-bottom: 2px solid #dfe6e9; 
+}
+.tab-btn { 
+    flex: 1; 
+    padding: 14px; 
+    background: transparent; 
+    border: none; 
+    border-bottom: 3px solid transparent; 
+    cursor: pointer; 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: #7f8c8d; 
+    transition: all 0.3s ease; 
+    text-transform: uppercase; 
+}
+.tab-btn.active { 
+    color: #2c3e50; 
+    border-bottom-color: #2c3e50; 
+}
+.payment-section { 
+    display: none; 
+    text-align: left; 
+    animation: fadeIn 0.4s ease-in-out; 
+}
+.payment-section.active { 
+    display: block; 
+}
+.form-row { 
+    display: flex; 
+    gap: 20px; 
+}
+.form-row .form-group { 
+    flex: 1; 
+}
+.card-icons { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: -15px; 
+    margin-bottom: 20px; 
+    font-size: 11px; 
+    color: #7f8c8d; 
+    font-weight: 700; 
+}
+.card-icons span { 
+    background: #ecf0f1; 
+    padding: 4px 10px; 
+    border-radius: 3px; 
+    border: 1px solid #bdc3c7; 
+}
+.crypto-networks { 
+    display: grid; 
+    gap: 12px; 
+    margin-top: 20px; 
+}
+.btn-crypto { 
+    background: #ffffff; 
+    border: 1px solid #d1d9e6; 
+    padding: 16px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    text-align: left; 
+    transition: all 0.3s ease; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    color: #2c3e50; 
+    width: 100%; 
+    margin: 0; 
+}
+.btn-crypto:hover { 
+    border-color: #0070cc; 
+    background: #f0f8ff; 
+}
+.wallet-info-box { 
+    background: #f8fafc; 
+    padding: 25px; 
+    border-radius: 4px; 
+    margin: 20px 0; 
+    border-left: 4px solid #0070cc; 
+    text-align: left; 
+}
+.address-box { 
+    background: #ffffff; 
+    padding: 12px; 
+    border-radius: 4px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 10px; 
+    margin: 15px 0; 
+    border: 1px solid #cbd5e0; 
+}
+.address-box code { 
+    flex: 1; 
+    word-break: break-all; 
+    font-size: 13px; 
+    color: #2c3e50; 
+    font-family: monospace; 
+    background: #ecf0f1; 
+    padding: 8px; 
+    border-radius: 3px; 
+}
+.btn-copy { 
+    background: #34495e; 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 3px; 
+    cursor: pointer; 
+    font-size: 13px; 
+    font-weight: 700; 
+    white-space: nowrap; 
+}
+.warning-text { 
+    color: #c0392b; 
+    font-size: 13px; 
+    background: #fdedec; 
+    padding: 12px; 
+    border-radius: 4px; 
+    margin-top: 15px; 
+    border: 1px solid #f5b7b1; 
+}
+.invoice { 
+    background: #f8fafc; 
+    padding: 25px; 
+    border-radius: 4px; 
+    margin: 20px 0 30px 0; 
+    text-align: left; 
+    border: 1px solid #d1d9e6; 
+}
+.invoice-row { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 10px 0; 
+    border-bottom: 1px solid #e2e8f0; 
+    font-size: 14px; 
+}
+.invoice-row.total { 
+    font-size: 18px; 
+    color: #0070cc; 
+    border-top: 2px solid #0070cc; 
+    margin-top: 15px; 
+    padding-top: 15px; 
+    font-weight: 700; 
+}
+.success-message { 
+    background: #e8f6f3; 
+    color: #117a65; 
+    padding: 40px 30px; 
+    border-radius: 4px; 
+    margin: 20px 0; 
+    border: 1px solid #a3e4d7; 
+    text-align: center; 
+}
+.error-message { 
+    background: #fdedec; 
+    color: #922b21; 
+    padding: 30px; 
+    border-radius: 4px; 
+    text-align: center; 
+    border: 1px solid #f5b7b1; 
+    margin: 20px 0; 
+}
+
+/* =========================================
+   8. Responsive Design (SINGLE BLOCK)
    ========================================= */
 @media (max-width: 1200px) {
     .servers-grid { 
@@ -599,11 +764,25 @@ textarea {
         width: 100%;
         justify-content: center;
     }
+    
+    .main-content {
+        margin-top: 150px; /* Adjusted for stacked header */
+    }
 }
 
 @media (max-width: 768px) {
+    .header-container { 
+        flex-direction: column; 
+        gap: 20px; 
+        padding: 15px 20px; 
+    }
+    .main-nav { 
+        flex-wrap: wrap; 
+        justify-content: center; 
+    }
     .main-content { 
         padding: 20px 15px; 
+        margin-top: 150px; /* Adjusted for stacked header */
     }
     .page-header h1 { 
         font-size: 28px; 
