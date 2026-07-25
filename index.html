@@ -5,14 +5,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server Shop - Premium Servers</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="landing-container">
-        <h1>Welcome to Server Shop</h1>
-        <p>Premium servers for your business needs</p>
-        <button onclick="window.location.href='login.html'" class="btn-primary">
-            Login / Sign Up
-        </button>
+    <div class="dashboard-container" id="main-container">
+        <!-- Animated Logo -->
+        <div class="site-logo">
+            <img src="images/logo.png" alt="Server Shop Logo" class="logo-image">
+            <span class="logo-text">Server Shop</span>
+        </div>
+
+        <!-- Guest View (Not Logged In) -->
+        <div id="guest-view" style="display: none;">
+            <h1 style="font-size: 2.2rem; margin-bottom: 15px; color: #1a252f;">Premium High-Performance Servers</h1>
+            <p style="color: #718096; font-size: 1.1rem; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                Deploy your applications on enterprise-grade infrastructure with 99.9% uptime, advanced DDoS protection, and 24/7 expert support.
+            </p>
+            
+            <div class="guest-message">
+                <p>🔒 Please login to view available servers and make purchases.</p>
+            </div>
+
+            <div class="landing-buttons">
+                <button onclick="window.location.href='login.html'" class="btn-primary btn-large">
+                    👤 Login / Sign Up
+                </button>
+                <button onclick="window.location.href='login.html'" class="btn-secondary btn-large">
+                    🖥️ Buy Server
+                </button>
+            </div>
+        </div>
+
+        <!-- User View (Logged In) -->
+        <div id="user-view" style="display: none;">
+            <div class="header">
+                <h2>Welcome, <span id="user-email"></span></h2>
+                <div>
+                    <button onclick="openChat()" class="btn-secondary">💬 Support Chat</button>
+                    <button onclick="logout()" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px; color: #2c3e50;">Available Servers</h3>
+            <div class="servers-grid" id="servers-grid">
+                <!-- Servers will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Chat Modal -->
+        <div id="chat-modal" class="chat-modal" style="display: none;">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>💬 Support Chat</h3>
+                    <button onclick="closeChat()" class="btn-close">×</button>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be loaded here -->
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="chat-message" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
+                    <button onclick="sendMessage()" class="btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        // Sample servers data
+        const servers = [
+            { 
+                id: 1, 
+                name: '2 x Xeon Platinum 8173M',
+                cpuBrand: 'Intel Xeon',
+                benchmark: 158145,
+                cores: '56 Cores 2 CPU',
+                ram: '128GB Memory',
+                storage: '(12)HDD or (12)SSD or (2)NVMe',
+                network: '40gbps Unmetered',
+                price: 2279
+            },
+            { 
+                id: 2, 
+                name: 'AMD RYZEN 9900X',
+                cpuBrand: 'AMD Ryzen',
+                benchmark: 127510,
+                cores: '12 Cores Single CPU',
+                ram: '64GB Memory',
+                storage: '(4)HDD or (4)SSD or (2)NVMe',
+                network: '40gbps Unmetered',
+                price: 2149
+            },
+            { 
+                id: 3, 
+                name: '2 x Xeon Gold 6230R 8SFF',
+                cpuBrand: 'Intel Xeon Gold',
+                benchmark: 186318,
+                cores: '52 Cores 2 CPU',
+                ram: '128GB Memory',
+                storage: '(8)SSD or (2)NVMe',
+                network: '40gbps Unmetered',
+                price: 2310
+            }
+        ];
+
+        let user = null;
+        let chatUnsubscribe = null;
+
+        // Check authentication state
+        auth.onAuthStateChanged((currentUser) => {
+            user = currentUser;
+            if (user) {
+                // User is logged in - show dashboard
+                document.getElementById('guest-view').style.display = 'none';
+                document.getElementById('user-view').style.display = 'block';
+                document.getElementById('user-email').textContent = user.email;
+                loadServers();
+            } else {
+                // User is NOT logged in - show guest view
+                document.getElementById('guest-view').style.display = 'block';
+                document.getElementById('user-view').style.display = 'none';
+            }
+        });
+
+        function loadServers() {
+            const grid = document.getElementById('servers-grid');
+            grid.innerHTML = servers.map(server => `
+                <div class="server-card">
+                    <h4>${server.name}</h4>
+                    
+                    <div class="benchmark">
+                        <span class="benchmark-icon"></span>
+                        <span class="benchmark-score">${server.benchmark}</span>
+                    </div>
+                    
+                    <ul class="server-specs">
+                        <li><strong>${server.cores}</strong></li>
+                        <li><strong>${server.ram}</strong></li>
+                        <li>${server.storage}</li>
+                        <li>
+                            <span class="network-badge">${server.network}</span>
+                        </li>
+                        <li>IPMI Console</li>
+                        <li>DDoS Protection</li>
+                    </ul>
+                    
+                    <div class="price-section">
+                        <div class="price-label">Cost:</div>
+                        <div class="price">$${server.price.toLocaleString()}<span class="price-period">/mo</span></div>
+                    </div>
+                    
+                    <button onclick="selectServer(${server.id})" class="configure-btn">
+                        Configure Now!
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function selectServer(serverId) {
+            const server = servers.find(s => s.id === serverId);
+            sessionStorage.setItem('selected-server', JSON.stringify(server));
+            sessionStorage.setItem('selected-plan', '1month');
+            sessionStorage.setItem('selected-price', server.price);
+            window.location.href = 'payment.html';
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        // Chat Functions
+        function openChat() {
+            document.getElementById('chat-modal').style.display = 'flex';
+            loadChatMessages();
+        }
+
+        function closeChat() {
+            document.getElementById('chat-modal').style.display = 'none';
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function loadChatMessages() {
+            if (!user) return;
+
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+            }
+
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = '<p style="text-align: center; color: #666;">Loading messages...</p>';
+
+            chatUnsubscribe = db.collection('chats')
+                .doc(user.uid)
+                .collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((snapshot) => {
+                    messagesContainer.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        messagesContainer.innerHTML = '<p style="text-align: center; color: #666;">No messages yet. Start the conversation!</p>';
+                        return;
+                    }
+
+                    snapshot.forEach((doc) => {
+                        const msg = doc.data();
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `chat-message ${msg.sender}`;
+                        
+                        const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString() : '';
+                        
+                        messageDiv.innerHTML = `
+                            <div class="message-bubble">${msg.text}</div>
+                            <div class="message-time">${time}</div>
+                        `;
+                        
+                        messagesContainer.appendChild(messageDiv);
+                    });
+
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-message');
+            const text = input.value.trim();
+            
+            if (!text || !user) return;
+
+            try {
+                await db.collection('chats').doc(user.uid).set({
+                    userEmail: user.email,
+                    lastMessage: text,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                }, { merge: true });
+
+                await db.collection('chats').doc(user.uid).collection('messages').add({
+                    sender: 'user',
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                input.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message');
+            }
+        }
+    </script>
 </body>
 </html>
