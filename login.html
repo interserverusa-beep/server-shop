@@ -143,7 +143,7 @@
             }
         }
 
-        async function verifyCode() {
+                async function verifyCode() {
             const enteredCode = document.getElementById('verification-code').value.trim();
             const verifyBtn = document.getElementById('verify-btn');
 
@@ -180,18 +180,31 @@
 
                 // Code is valid! Proceed with Firebase Auth
                 try {
+                    // 1. ابتدا سعی می‌کنیم کاربر را وارد کنیم
                     await auth.signInWithEmailAndPassword(currentUserEmail, currentUserPassword);
                     showMessage('Login successful! Redirecting...', 'green');
-                    await db.collection('verification_codes').doc(currentUserEmail).delete(); // Clean up
+                    await db.collection('verification_codes').doc(currentUserEmail).delete(); // پاکسازی کد
                     setTimeout(() => window.location.href = 'index.html', 1000);
+                    
                 } catch (authError) {
-                    if (authError.code === 'auth/user-not-found') {
-                        await auth.createUserWithEmailAndPassword(currentUserEmail, currentUserPassword);
-                        showMessage('Account created successfully! Redirecting...', 'green');
-                        await db.collection('verification_codes').doc(currentUserEmail).delete();
-                        setTimeout(() => window.location.href = 'index.html', 1000);
+                    // 2. اگر خطا داد، ممکن است کاربر جدید باشد (به دلیل فعال بودن Email enumeration protection در فایربیس)
+                    // بنابراین سعی می‌کنیم اکانت را بسازیم.
+                    if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-login-credentials') {
+                        try {
+                            await auth.createUserWithEmailAndPassword(currentUserEmail, currentUserPassword);
+                            showMessage('Account created successfully! Redirecting...', 'green');
+                            await db.collection('verification_codes').doc(currentUserEmail).delete();
+                            setTimeout(() => window.location.href = 'index.html', 1000);
+                        } catch (createError) {
+                            // 3. اگر اکانت از قبل با رمز عبور متفاوتی وجود داشته باشد
+                            if (createError.code === 'auth/email-already-in-use') {
+                                showMessage('This email is already registered with a different password.', 'red');
+                            } else {
+                                showMessage('Registration error: ' + createError.message, 'red');
+                            }
+                        }
                     } else {
-                        throw authError;
+                        showMessage('Login error: ' + authError.message, 'red');
                     }
                 }
 
@@ -202,7 +215,6 @@
                 verifyBtn.disabled = false;
             }
         }
-
         async function resendCode() {
             showMessage('Resending code...', 'blue');
             await sendVerificationCode();
