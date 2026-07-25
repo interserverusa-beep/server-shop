@@ -12,8 +12,8 @@
 
 body {
     font-family: 'Lato', 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); /* Cold Ice Gradient */
-    color: #2c3e50; /* Slate Blue Text */
+    background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+    color: #2c3e50;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -22,8 +22,8 @@ body {
 }
 
 h1, h2, h3, h4 {
-    font-family: 'Playfair Display', serif; /* Neoclassic Serif Font */
-    color: #1a252f; /* Dark Slate */
+    font-family: 'Playfair Display', serif;
+    color: #1a252f;
     letter-spacing: 0.5px;
     margin-bottom: 15px;
 }
@@ -32,9 +32,9 @@ h1, h2, h3, h4 {
 .landing-container, .login-container, .dashboard-container, .payment-container {
     background: #ffffff;
     padding: 40px;
-    border-radius: 4px; /* Neoclassic prefers subtle rounding */
+    border-radius: 8px;
     border: 1px solid #d1d9e6;
-    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.08); /* Elegant, soft shadow */
+    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.08);
     max-width: 700px;
     width: 100%;
     text-align: center;
@@ -44,12 +44,12 @@ h1, h2, h3, h4 {
 /* =========================================
    2. Form Elements (Refined & Cold)
    ========================================= */
-input, select {
+input, select, textarea {
     width: 100%;
     padding: 14px;
     margin: 8px 0 20px 0;
     border: 1px solid #cbd5e0;
-    background: #f8fafc; /* Very light cold gray */
+    background: #f8fafc;
     border-radius: 4px;
     font-size: 15px;
     color: #2c3e50;
@@ -57,17 +57,22 @@ input, select {
     font-family: 'Lato', sans-serif;
 }
 
-input:focus, select:focus {
+input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #34495e; /* Dark Slate on focus */
+    border-color: #34495e;
     background: #ffffff;
     box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.1);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
 }
 
 /* =========================================
    3. Buttons (Elegant & Cold)
    ========================================= */
-.btn-primary, .btn-secondary, .btn-payment, .btn-pay {
+.btn-primary, .btn-secondary, .btn-payment, .btn-pay, .btn-configure {
     padding: 14px 28px;
     margin: 10px 5px;
     border: none;
@@ -78,14 +83,15 @@ input:focus, select:focus {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: 'Lato', sans-serif;
 }
 
-.btn-primary, .btn-pay {
-    background: #2c3e50; /* Dark Slate Blue */
+.btn-primary, .btn-pay, .btn-configure {
+    background: #2c3e50;
     color: #ffffff;
 }
 
-.btn-primary:hover, .btn-pay:hover {
+.btn-primary:hover, .btn-pay:hover, .btn-configure:hover {
     background: #34495e;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
@@ -106,25 +112,27 @@ input:focus, select:focus {
     max-width: 350px;
     margin: 15px auto;
     display: block;
-    background: #16a085; /* Muted Teal (Cold Green) */
+    background: #16a085;
     color: white;
 }
 
-.btn-payment:hover {
-    background: #138d75;
-}
+.btn-payment:hover { background: #138d75; }
+.btn-paypal { background: #2980b9 !important; }
+.btn-paypal:hover { background: #2471a3 !important; }
+.btn-crypto-pay { background: #8e44ad !important; }
+.btn-crypto-pay:hover { background: #7d3c98 !important; }
 
 /* =========================================
-   4. Payment Tabs (Neoclassic Style)
+   4. Payment Tabs & Sections
    ========================================= */
-.payment-tabs {
+.payment-tabs, .dashboard-tabs {
     display: flex;
     gap: 0;
     margin: 30px 0;
     border-bottom: 2px solid #dfe6e9;
 }
 
-.tab-btn {
+.tab-btn, .dashboard-tab-btn {
     flex: 1;
     padding: 14px;
     background: transparent;
@@ -140,26 +148,23 @@ input:focus, select:focus {
     letter-spacing: 0.5px;
 }
 
-.tab-btn.active {
+.tab-btn.active, .dashboard-tab-btn.active {
     color: #2c3e50;
     border-bottom-color: #2c3e50;
 }
 
-.tab-btn:hover:not(.active) {
+.tab-btn:hover:not(.active), .dashboard-tab-btn:hover:not(.active) {
     color: #34495e;
     background: #f8f9fa;
 }
 
-/* =========================================
-   5. Payment Sections & Forms
-   ========================================= */
-.payment-section {
+.payment-section, .tab-content {
     display: none;
     text-align: left;
     animation: fadeIn 0.4s ease-in-out;
 }
 
-.payment-section.active {
+.payment-section.active, .tab-content.active {
     display: block;
 }
 
@@ -186,1174 +191,280 @@ input:focus, select:focus {
     letter-spacing: 0.5px;
 }
 
-.form-row {
-    display: flex;
-    gap: 20px;
-}
-
-.form-row .form-group {
-    flex: 1;
-}
+.form-row { display: flex; gap: 20px; }
+.form-row .form-group { flex: 1; }
 
 .card-icons {
-    display: flex;
-    gap: 10px;
-    margin-top: -15px;
-    margin-bottom: 20px;
-    font-size: 11px;
-    color: #7f8c8d;
-    font-weight: 700;
+    display: flex; gap: 10px; margin-top: -15px; margin-bottom: 20px;
+    font-size: 11px; color: #7f8c8d; font-weight: 700;
 }
-
 .card-icons span {
-    background: #ecf0f1;
-    padding: 4px 10px;
-    border-radius: 3px;
-    border: 1px solid #bdc3c7;
-}
-
-.btn-paypal {
-    background: #2980b9 !important; /* Cold Blue for PayPal */
-}
-.btn-paypal:hover {
-    background: #2471a3 !important;
-}
-
-.btn-crypto-pay {
-    background: #8e44ad !important; /* Muted Cold Purple for Crypto */
-}
-.btn-crypto-pay:hover {
-    background: #7d3c98 !important;
+    background: #ecf0f1; padding: 4px 10px; border-radius: 3px; border: 1px solid #bdc3c7;
 }
 
 /* =========================================
-   6. Crypto Specific Styles
+   5. Crypto Specific Styles
    ========================================= */
-.crypto-networks {
-    display: grid;
-    gap: 12px;
-    margin-top: 20px;
-}
+.crypto-networks { display: grid; gap: 12px; margin-top: 20px; }
 
 .btn-crypto {
-    background: #ffffff;
-    border: 1px solid #d1d9e6;
-    padding: 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.3s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #2c3e50;
-    width: 100%;
+    background: #ffffff; border: 1px solid #d1d9e6; padding: 16px;
+    border-radius: 4px; cursor: pointer; text-align: left;
+    transition: all 0.3s ease; display: flex; justify-content: space-between;
+    align-items: center; color: #2c3e50; width: 100%;
 }
-
-.btn-crypto:hover {
-    border-color: #2c3e50;
-    background: #f8fafc;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.05);
-}
-
-.btn-crypto strong {
-    color: #2c3e50;
-    font-size: 15px;
-    font-family: 'Playfair Display', serif;
-}
-
-.btn-crypto small {
-    color: #7f8c8d;
-    font-size: 12px;
-}
+.btn-crypto:hover { border-color: #2c3e50; background: #f8fafc; box-shadow: 0 2px 8px rgba(44, 62, 80, 0.05); }
+.btn-crypto strong { color: #2c3e50; font-size: 15px; font-family: 'Playfair Display', serif; }
+.btn-crypto small { color: #7f8c8d; font-size: 12px; }
 
 .btn-back {
-    background: none;
-    border: none;
-    color: #2c3e50;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 20px;
-    padding: 0;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    background: none; border: none; color: #2c3e50; cursor: pointer;
+    font-size: 14px; margin-bottom: 20px; padding: 0; font-weight: 700;
+    text-decoration: underline; text-underline-offset: 4px;
 }
 
 .wallet-info-box {
-    background: #f8fafc;
-    padding: 25px;
-    border-radius: 4px;
-    margin: 20px 0;
-    border-left: 4px solid #2c3e50;
-    text-align: left;
+    background: #f8fafc; padding: 25px; border-radius: 4px;
+    margin: 20px 0; border-left: 4px solid #2c3e50; text-align: left;
 }
 
 .amount-box {
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 4px;
-    text-align: center;
-    margin: 15px 0;
-    border: 1px dashed #2c3e50;
+    background: #ffffff; padding: 15px; border-radius: 4px;
+    text-align: center; margin: 15px 0; border: 1px dashed #2c3e50;
 }
 
-.big-amount {
-    font-size: 28px;
-    font-weight: 700;
-    color: #2c3e50;
-    font-family: 'Playfair Display', serif;
-}
+.big-amount { font-size: 28px; font-weight: 700; color: #2c3e50; font-family: 'Playfair Display', serif; }
 
 .address-box {
-    background: #ffffff;
-    padding: 12px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0;
-    border: 1px solid #cbd5e0;
+    background: #ffffff; padding: 12px; border-radius: 4px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; margin: 15px 0; border: 1px solid #cbd5e0;
 }
 
 .address-box code {
-    flex: 1;
-    word-break: break-all;
-    font-size: 13px;
-    color: #2c3e50;
-    font-family: 'Courier New', Courier, monospace;
-    background: #ecf0f1;
-    padding: 8px;
-    border-radius: 3px;
+    flex: 1; word-break: break-all; font-size: 13px; color: #2c3e50;
+    font-family: 'Courier New', Courier, monospace; background: #ecf0f1; padding: 8px; border-radius: 3px;
 }
 
 .btn-copy {
-    background: #34495e;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-    transition: background 0.3s;
+    background: #34495e; color: white; border: none; padding: 8px 16px;
+    border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 700;
+    white-space: nowrap; transition: background 0.3s;
 }
-
-.btn-copy:hover {
-    background: #2c3e50;
-}
+.btn-copy:hover { background: #2c3e50; }
 
 .warning-text {
-    color: #c0392b; /* Muted Cold Red */
-    font-size: 13px;
-    background: #fdedec;
-    padding: 12px;
-    border-radius: 4px;
-    margin-top: 15px;
-    border: 1px solid #f5b7b1;
+    color: #c0392b; font-size: 13px; background: #fdedec;
+    padding: 12px; border-radius: 4px; margin-top: 15px; border: 1px solid #f5b7b1;
 }
 
-.neo-divider {
-    border: 0;
-    height: 1px;
-    background: #dfe6e9;
-    margin: 30px 0;
-}
+.neo-divider { border: 0; height: 1px; background: #dfe6e9; margin: 30px 0; }
 
 /* =========================================
-   7. Invoice & Messages
+   6. Invoice & Messages
    ========================================= */
 .invoice {
-    background: #f8fafc;
-    padding: 25px;
-    border-radius: 4px;
-    margin: 20px 0 30px 0;
-    text-align: left;
-    border: 1px solid #d1d9e6;
+    background: #f8fafc; padding: 25px; border-radius: 4px;
+    margin: 20px 0 30px 0; text-align: left; border: 1px solid #d1d9e6;
 }
 
-.invoice-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 14px;
-}
-
-.invoice-row:last-child {
-    border-bottom: none;
-}
-
-.invoice-row.total {
-    font-size: 18px;
-    color: #2c3e50;
-    border-top: 2px solid #2c3e50;
-    margin-top: 15px;
-    padding-top: 15px;
-}
-
-.invoice-row span {
-    color: #7f8c8d;
-}
+.invoice-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+.invoice-row:last-child { border-bottom: none; }
+.invoice-row.total { font-size: 18px; color: #2c3e50; border-top: 2px solid #2c3e50; margin-top: 15px; padding-top: 15px; }
+.invoice-row span { color: #7f8c8d; }
 
 .success-message {
-    background: #e8f6f3; /* Cold Mint Green */
-    color: #117a65;
-    padding: 40px 30px;
-    border-radius: 4px;
-    margin: 20px 0;
-    border: 1px solid #a3e4d7;
-    text-align: center;
+    background: #e8f6f3; color: #117a65; padding: 40px 30px;
+    border-radius: 4px; margin: 20px 0; border: 1px solid #a3e4d7; text-align: center;
 }
-
-.success-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
-}
-
-.success-message h3 {
-    color: #0e6655;
-    margin-bottom: 15px;
-}
-
-.highlight-text {
-    background: #d1f2eb;
-    padding: 10px;
-    border-radius: 4px;
-    margin: 15px 0 25px 0;
-    font-size: 14px;
-}
+.success-icon { font-size: 48px; margin-bottom: 15px; }
+.success-message h3 { color: #0e6655; margin-bottom: 15px; }
+.highlight-text { background: #d1f2eb; padding: 10px; border-radius: 4px; margin: 15px 0 25px 0; font-size: 14px; }
 
 .error-message {
-    background: #fdedec; /* Cold Light Red */
-    color: #922b21;
-    padding: 30px;
-    border-radius: 4px;
-    text-align: center;
-    border: 1px solid #f5b7b1;
-    margin: 20px 0;
-    animation: fadeIn 0.3s ease-in-out;
+    background: #fdedec; color: #922b21; padding: 30px;
+    border-radius: 4px; text-align: center; border: 1px solid #f5b7b1;
+    margin: 20px 0; animation: fadeIn 0.3s ease-in-out;
 }
-
-.error-message h3 {
-    color: #922b21;
-    margin-bottom: 15px;
-}
+.error-message h3 { color: #922b21; margin-bottom: 15px; }
 
 /* =========================================
-   8. Dashboard Specific Styles (NEW)
+   7. Dashboard Specific Styles
    ========================================= */
+.dashboard-container { max-width: 1400px; padding: 50px 40px; text-align: left; }
+.dashboard-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 25px; border-bottom: 2px solid #e0eafc; }
+.dashboard-top-bar h2 { font-family: 'Playfair Display', serif; color: #1a252f; font-size: 28px; margin: 0; }
+.dashboard-top-bar h2 span { color: #2c3e50; font-weight: 700; }
+.dashboard-title { font-family: 'Playfair Display', serif; color: #1a252f; font-size: 28px; margin-bottom: 10px; }
+.dashboard-subtitle { color: #7f8c8d; margin-bottom: 40px; font-size: 15px; }
 
-/* Dashboard Container Override */
-.dashboard-container {
-    max-width: 1400px;
-    padding: 50px 40px;
-}
+.info-card { background: #f8fafc; border-radius: 8px; padding: 30px; text-align: left; border: 1px solid #e0eafc; }
+.info-item { padding: 15px 0; border-bottom: 1px solid #f0f4f8; display: flex; justify-content: space-between; }
+.info-item:last-child { border-bottom: none; }
+.status-active { color: #27ae60; font-weight: 600; }
 
-.dashboard-top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    padding-bottom: 25px;
-    border-bottom: 2px solid #e0eafc;
-}
+.empty-state { background: #f8fafc; border-radius: 8px; padding: 40px 30px; text-align: center; border: 1px dashed #e0eafc; }
+.empty-icon { margin: 0 auto 20px; color: #3498db; }
+.empty-state h4 { font-size: 22px; color: #1a252f; margin-bottom: 15px; }
+.empty-state p { color: #7f8c8d; margin-bottom: 25px; }
 
-.dashboard-top-bar h2 {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 28px;
-    margin: 0;
-}
+#support-form-container { max-width: 600px; margin: 0 auto; }
 
-.dashboard-top-bar h2 span {
-    color: #2c3e50;
-    font-weight: 700;
-}
-
-.dashboard-title {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.dashboard-subtitle {
-    color: #7f8c8d;
-    margin-bottom: 40px;
-    font-size: 15px;
-}
-
-.servers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
-}
+/* =========================================
+   8. Servers Grid (Interserver Style)
+   ========================================= */
+.servers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 30px; margin-top: 30px; }
 
 .server-card {
-    background: #ffffff;
-    border: 2px solid #e0eafc;
-    border-radius: 8px;
-    padding: 40px 30px;
-    text-align: center;
-    transition: all 0.3s ease;
+    background: #ffffff; border: 2px solid #e0eafc; border-radius: 8px;
+    padding: 40px 30px; text-align: center; transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(44, 62, 80, 0.06);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex; flex-direction: column; align-items: center;
 }
+.server-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(44, 62, 80, 0.12); border-color: #3498db; }
+.server-card h4 { font-family: 'Playfair Display', serif; color: #1a252f; font-size: 24px; margin-bottom: 25px; font-weight: 700; }
 
-.server-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.12);
-    border-color: #3498db;
-}
+.processor-logo { width: 180px; height: 80px; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; }
+.intel-logo, .amd-logo { font-family: 'Segoe UI', sans-serif; font-size: 28px; font-weight: 700; color: #0068b5; display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.intel-logo .intel { font-size: 32px; border: 3px solid #0068b5; border-radius: 50%; width: 100px; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; }
+.intel-logo .xeon { font-size: 24px; letter-spacing: 2px; }
+.intel-logo .variant { font-size: 14px; color: #2c3e50; margin-top: 5px; }
+.amd-logo .amd { font-size: 18px; color: #0068b5; margin-bottom: 5px; }
+.amd-logo .ryzen { font-size: 32px; letter-spacing: 3px; color: #0068b5; }
 
-.server-card h4 {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 24px;
-    margin-bottom: 25px;
-    font-weight: 700;
-}
+.performance-score { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding: 15px 25px; background: #f8fafc; border-radius: 8px; border: 1px solid #e0eafc; }
+.score-icon { width: 50px; height: 50px; }
+.score-icon svg { width: 100%; height: 100%; fill: #3498db; }
+.score-number { font-size: 32px; font-weight: 700; color: #1a252f; font-family: 'Playfair Display', serif; }
 
-.processor-logo {
-    width: 180px;
-    height: 80px;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.server-specs { width: 100%; list-style: none; padding: 0; margin: 0 0 30px 0; text-align: left; }
+.server-specs li { padding: 12px 0; border-bottom: 1px solid #f0f4f8; color: #2c3e50; font-size: 15px; display: flex; align-items: center; gap: 10px; font-family: 'Lato', sans-serif; }
+.server-specs li:last-child { border-bottom: none; }
+.server-specs li::before { content: "✓"; color: #3498db; font-weight: 700; font-size: 16px; width: 20px; }
+.spec-label { font-weight: 600; color: #34495e; min-width: 140px; }
+.spec-value { color: #2c3e50; flex: 1; }
 
-.intel-logo {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #0068b5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.2;
-}
+.server-price { margin: 20px 0; padding: 20px; background: #f8fafc; border-radius: 8px; border: 2px solid #e0eafc; width: 100%; }
+.price-label { font-size: 14px; color: #7f8c8d; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.price-amount { font-size: 36px; font-weight: 700; color: #2c3e50; font-family: 'Playfair Display', serif; }
+.price-amount .currency { font-size: 24px; vertical-align: super; margin-right: 5px; }
+.price-amount .period { font-size: 16px; color: #7f8c8d; font-weight: 400; margin-left: 5px; }
 
-.intel-logo .intel {
-    font-size: 32px;
-    border: 3px solid #0068b5;
-    border-radius: 50%;
-    width: 100px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 5px;
-}
+.btn-configure { width: 100%; padding: 16px 28px; background: #2980b9; color: #ffffff; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; margin-top: auto; }
+.btn-configure:hover { background: #3498db; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(41, 128, 185, 0.3); }
 
-.intel-logo .xeon {
-    font-size: 24px;
-    letter-spacing: 2px;
-}
-
-.intel-logo .variant {
-    font-size: 14px;
-    color: #2c3e50;
-    margin-top: 5px;
-}
-
-.amd-logo {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #0068b5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.2;
-}
-
-.amd-logo .amd {
-    font-size: 18px;
-    color: #0068b5;
-    margin-bottom: 5px;
-}
-
-.amd-logo .ryzen {
-    font-size: 32px;
-    letter-spacing: 3px;
-    color: #0068b5;
-}
-
-.performance-score {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    padding: 15px 25px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e0eafc;
-}
-
-.score-icon {
-    width: 50px;
-    height: 50px;
-}
-
-.score-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: #3498db;
-}
-
-.score-number {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1a252f;
-    font-family: 'Playfair Display', serif;
-}
-
-.server-specs {
-    width: 100%;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 30px 0;
-    text-align: left;
-}
-
-.server-specs li {
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f4f8;
-    color: #2c3e50;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Lato', sans-serif;
-}
-
-.server-specs li:last-child {
-    border-bottom: none;
-}
-
-.server-specs li::before {
-    content: "✓";
-    color: #3498db;
-    font-weight: 700;
-    font-size: 16px;
-    width: 20px;
-}
-
-.spec-label {
-    font-weight: 600;
-    color: #34495e;
-    min-width: 140px;
-}
-
-.spec-value {
-    color: #2c3e50;
-    flex: 1;
-}
-
-.server-price {
-    margin: 20px 0;
-    padding: 20px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 2px solid #e0eafc;
-    width: 100%;
-}
-
-.price-label {
-    font-size: 14px;
-    color: #7f8c8d;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.price-amount {
-    font-size: 36px;
-    font-weight: 700;
-    color: #2c3e50;
-    font-family: 'Playfair Display', serif;
-}
-
-.price-amount .currency {
-    font-size: 24px;
-    vertical-align: super;
-    margin-right: 5px;
-}
-
-.price-amount .period {
-    font-size: 16px;
-    color: #7f8c8d;
-    font-weight: 400;
-    margin-left: 5px;
-}
-
-.btn-configure {
-    width: 100%;
-    padding: 16px 28px;
-    background: #2980b9;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: auto;
-    font-family: 'Lato', sans-serif;
-}
-
-.btn-configure:hover {
-    background: #3498db;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(41, 128, 185, 0.3);
-}
-
-.plan-selector {
-    width: 100%;
-    margin: 20px 0;
-}
-
-.plan-selector select {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #cbd5e0;
-    background: #f8fafc;
-    border-radius: 6px;
-    font-size: 15px;
-    color: #2c3e50;
-    font-family: 'Lato', sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.plan-selector select:focus {
-    outline: none;
-    border-color: #3498db;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
+.plan-selector { width: 100%; margin: 20px 0; }
+.plan-selector select { width: 100%; padding: 14px; border: 1px solid #cbd5e0; background: #f8fafc; border-radius: 6px; font-size: 15px; color: #2c3e50; font-family: 'Lato', sans-serif; cursor: pointer; transition: all 0.3s ease; margin: 0; }
+.plan-selector select:focus { outline: none; border-color: #3498db; background: #ffffff; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
 
 /* =========================================
-   9. Responsive
+   9. Live Chat Modal Styles (NEW)
    ========================================= */
-@media (max-width: 1200px) {
-    .servers-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.chat-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(44, 62, 80, 0.6); display: flex;
+    justify-content: center; align-items: center; z-index: 1000;
 }
 
-@media (max-width: 768px) {
-    .servers-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .dashboard-container {
-        padding: 30px 20px;
-    }
-    
-    .server-card {
-        padding: 30px 20px;
-    }
-    
-    .price-amount {
-        font-size: 28px;
-    }
-    
-    .payment-container {
-        padding: 25px 20px;
-    }
-    
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-    
-    .payment-tabs {
-        flex-direction: column;
-        border-bottom: none;
-        gap: 5px;
-    }
-    
-    .tab-btn {
-        border: 1px solid #d1d9e6;
-        border-radius: 4px;
-        text-align: center;
-    }
-    
-    .tab-btn.active {
-        border-color: #2c3e50;
-        background: #f8fafc;
-        border-bottom: 1px solid #d1d9e6;
-    }
-
-    .address-box {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .btn-copy {
-        width: 100%;
-        margin-top: 10px;
-    }
+.chat-container {
+    background: #ffffff; border-radius: 8px; width: 90%; max-width: 500px;
+    height: 70vh; display: flex; flex-direction: column;
+    box-shadow: 0 15px 50px rgba(44, 62, 80, 0.2); border: 1px solid #d1d9e6;
 }
+
+.chat-header {
+    background: #2c3e50; color: white; padding: 20px;
+    border-radius: 8px 8px 0 0; display: flex;
+    justify-content: space-between; align-items: center;
+}
+
+.chat-header h3 { color: white; margin: 0; font-family: 'Lato', sans-serif; font-size: 18px; }
+.btn-close { background: none; border: none; color: white; font-size: 28px; cursor: pointer; line-height: 1; }
+.btn-close:hover { color: #e74c3c; }
+
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #f8fafc; }
+.chat-message { margin-bottom: 15px; display: flex; flex-direction: column; }
+.chat-message.user { align-items: flex-end; }
+.chat-message.admin { align-items: flex-start; }
+
+.message-bubble {
+    max-width: 80%; padding: 12px 16px; border-radius: 12px;
+    font-size: 14px; line-height: 1.4; word-wrap: break-word;
+}
+
+.chat-message.user .message-bubble {
+    background: #2980b9; color: white; border-bottom-right-radius: 4px;
+}
+
+.chat-message.admin .message-bubble {
+    background: #ffffff; color: #2c3e50; border: 1px solid #d1d9e6; border-bottom-left-radius: 4px;
+}
+
+.message-time { font-size: 11px; color: #7f8c8d; margin-top: 4px; }
+
+.chat-input {
+    display: flex; gap: 10px; padding: 15px;
+    border-top: 1px solid #e0eafc; background: white; border-radius: 0 0 8px 8px;
+}
+
+.chat-input input { flex: 1; margin: 0; }
+.chat-input button { padding: 12px 20px; margin: 0; }
 
 /* =========================================
-   8. Dashboard Specific Styles (UPDATED)
-   ========================================= */
-
-/* Dashboard Container Override */
-.dashboard-container {
-    max-width: 1400px;
-    padding: 50px 40px;
-}
-
-.dashboard-top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    padding-bottom: 25px;
-    border-bottom: 2px solid #e0eafc;
-}
-
-.dashboard-top-bar h2 {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 28px;
-    margin: 0;
-}
-
-.dashboard-top-bar h2 span {
-    color: #2c3e50;
-    font-weight: 700;
-}
-
-.dashboard-title {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.dashboard-subtitle {
-    color: #7f8c8d;
-    margin-bottom: 40px;
-    font-size: 15px;
-}
-
-/* Dashboard Tabs */
-.dashboard-tabs {
-    display: flex;
-    gap: 0;
-    margin: 30px 0;
-    border-bottom: 2px solid #dfe6e9;
-}
-
-.dashboard-tab-btn {
-    flex: 1;
-    padding: 14px;
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 700;
-    color: #7f8c8d;
-    transition: all 0.3s ease;
-    font-family: 'Lato', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.dashboard-tab-btn.active {
-    color: #2c3e50;
-    border-bottom-color: #2c3e50;
-}
-
-.dashboard-tab-btn:hover:not(.active) {
-    color: #34495e;
-    background: #f8f9fa;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* User Info Card */
-.info-card {
-    background: #f8fafc;
-    border-radius: 8px;
-    padding: 30px;
-    text-align: left;
-    border: 1px solid #e0eafc;
-}
-
-.info-item {
-    padding: 15px 0;
-    border-bottom: 1px solid #f0f4f8;
-    display: flex;
-    justify-content: space-between;
-}
-
-.info-item:last-child {
-    border-bottom: none;
-}
-
-.status-active {
-    color: #27ae60;
-    font-weight: 600;
-}
-
-/* Empty State for Purchase History */
-.empty-state {
-    background: #f8fafc;
-    border-radius: 8px;
-    padding: 40px 30px;
-    text-align: center;
-    border: 1px dashed #e0eafc;
-}
-
-.empty-icon {
-    margin: 0 auto 20px;
-    color: #3498db;
-}
-
-.empty-state h4 {
-    font-size: 22px;
-    color: #1a252f;
-    margin-bottom: 15px;
-}
-
-.empty-state p {
-    color: #7f8c8d;
-    margin-bottom: 25px;
-}
-
-/* Support Ticket Form */
-#support-form-container {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 700;
-    color: #34495e;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #cbd5e0;
-    background: #f8fafc;
-    border-radius: 4px;
-    font-size: 15px;
-    color: #2c3e50;
-    font-family: 'Lato', sans-serif;
-    transition: all 0.3s ease;
-}
-
-.form-group textarea {
-    min-height: 150px;
-}
-
-/* Success Message for Support Tickets */
-.success-message {
-    background: #e8f6f3; /* Cold Mint Green */
-    color: #117a65;
-    padding: 30px;
-    border-radius: 4px;
-    margin: 30px 0;
-    border: 1px solid #a3e4d7;
-    text-align: center;
-}
-
-.success-message h3 {
-    color: #0e6655;
-    margin-bottom: 15px;
-}
-
-.highlight-text {
-    background: #d1f2eb;
-    padding: 10px;
-    border-radius: 4px;
-    margin: 15px 0 25px 0;
-    font-size: 14px;
-    font-style: italic;
-}
-
-/* Servers Grid */
-.servers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
-}
-
-.server-card {
-    background: #ffffff;
-    border: 2px solid #e0eafc;
-    border-radius: 8px;
-    padding: 40px 30px;
-    text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(44, 62, 80, 0.06);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.server-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.12);
-    border-color: #3498db;
-}
-
-.server-card h4 {
-    font-family: 'Playfair Display', serif;
-    color: #1a252f;
-    font-size: 24px;
-    margin-bottom: 25px;
-    font-weight: 700;
-}
-
-.processor-logo {
-    width: 180px;
-    height: 80px;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.intel-logo {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #0068b5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.2;
-}
-
-.intel-logo .intel {
-    font-size: 32px;
-    border: 3px solid #0068b5;
-    border-radius: 50%;
-    width: 100px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 5px;
-}
-
-.intel-logo .xeon {
-    font-size: 24px;
-    letter-spacing: 2px;
-}
-
-.intel-logo .variant {
-    font-size: 14px;
-    color: #2c3e50;
-    margin-top: 5px;
-}
-
-.amd-logo {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #0068b5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.2;
-}
-
-.amd-logo .amd {
-    font-size: 18px;
-    color: #0068b5;
-    margin-bottom: 5px;
-}
-
-.amd-logo .ryzen {
-    font-size: 32px;
-    letter-spacing: 3px;
-    color: #0068b5;
-}
-
-.performance-score {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    padding: 15px 25px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e0eafc;
-}
-
-.score-icon {
-    width: 50px;
-    height: 50px;
-}
-
-.score-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: #3498db;
-}
-
-.score-number {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1a252f;
-    font-family: 'Playfair Display', serif;
-}
-
-.server-specs {
-    width: 100%;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 30px 0;
-    text-align: left;
-}
-
-.server-specs li {
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f4f8;
-    color: #2c3e50;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Lato', sans-serif;
-}
-
-.server-specs li:last-child {
-    border-bottom: none;
-}
-
-.server-specs li::before {
-    content: "✓";
-    color: #3498db;
-    font-weight: 700;
-    font-size: 16px;
-    width: 20px;
-}
-
-.spec-label {
-    font-weight: 600;
-    color: #34495e;
-    min-width: 140px;
-}
-
-.spec-value {
-    color: #2c3e50;
-    flex: 1;
-}
-
-.server-price {
-    margin: 20px 0;
-    padding: 20px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 2px solid #e0eafc;
-    width: 100%;
-}
-
-.price-label {
-    font-size: 14px;
-    color: #7f8c8d;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.price-amount {
-    font-size: 36px;
-    font-weight: 700;
-    color: #2c3e50;
-    font-family: 'Playfair Display', serif;
-}
-
-.price-amount .currency {
-    font-size: 24px;
-    vertical-align: super;
-    margin-right: 5px;
-}
-
-.price-amount .period {
-    font-size: 16px;
-    color: #7f8c8d;
-    font-weight: 400;
-    margin-left: 5px;
-}
-
-.btn-configure {
-    width: 100%;
-    padding: 16px 28px;
-    background: #2980b9;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: auto;
-    font-family: 'Lato', sans-serif;
-}
-
-.btn-configure:hover {
-    background: #3498db;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(41, 128, 185, 0.3);
-}
-
-.plan-selector {
-    width: 100%;
-    margin: 20px 0;
-}
-
-.plan-selector select {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #cbd5e0;
-    background: #f8fafc;
-    border-radius: 6px;
-    font-size: 15px;
-    color: #2c3e50;
-    font-family: 'Lato', sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.plan-selector select:focus {
-    outline: none;
-    border-color: #3498db;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-/* =========================================
-   9. Responsive
-   ========================================= */
-@media (max-width: 1200px) {
-    .servers-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .servers-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .dashboard-container {
-        padding: 30px 20px;
-    }
-    
-    .server-card {
-        padding: 30px 20px;
-    }
-    
-    .price-amount {
-        font-size: 28px;
-    }
-    
-    .dashboard-tabs {
-        flex-direction: column;
-    }
-    
-    .dashboard-tab-btn {
-        border: 1px solid #d1d9e6;
-        border-radius: 4px;
-        text-align: center;
-        margin-bottom: 5px;
-    }
-    
-    .dashboard-tab-btn.active {
-        border-color: #2c3e50;
-        background: #f8fafc;
-    }
-}
-
-/* =========================================
-   Animated Site Logo (Neoclassic & Cold)
+   10. Animated Site Logo
    ========================================= */
 .site-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    animation: fadeInDown 1s ease-out;
+    display: flex; align-items: center; justify-content: center;
+    gap: 15px; margin-bottom: 30px; animation: fadeInDown 1s ease-out;
 }
 
-.logo-icon {
-    font-size: 42px;
+.logo-image {
+    width: 50px; height: 50px; object-fit: contain;
     animation: pulse 3s infinite ease-in-out;
 }
 
+.logo-icon { display: none; } /* Hide emoji since we use image */
+
 .logo-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-family: 'Playfair Display', serif; font-size: 36px;
+    font-weight: 700; letter-spacing: 1px;
     background: linear-gradient(135deg, #0070cc 0%, #2c3e50 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-.landing-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 30px;
-}
+.landing-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+.btn-large { padding: 16px 40px; font-size: 18px; min-width: 260px; font-weight: 700; }
 
-.btn-large {
-    padding: 16px 40px;
-    font-size: 18px;
-    min-width: 260px;
-    font-weight: 700;
-}
-
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulse {
     0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0, 112, 204, 0)); }
-    50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(0, 112, 204, 0.3)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(0, 112, 204, 0.3)); }
     100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0, 112, 204, 0)); }
+}
+
+/* =========================================
+   11. Responsive Design
+   ========================================= */
+@media (max-width: 1200px) {
+    .servers-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .servers-grid { grid-template-columns: 1fr; }
+    .dashboard-container, .payment-container, .login-container { padding: 30px 20px; }
+    .server-card { padding: 30px 20px; }
+    .price-amount { font-size: 28px; }
+    
+    .form-row { flex-direction: column; gap: 0; }
+    
+    .payment-tabs, .dashboard-tabs { flex-direction: column; border-bottom: none; gap: 5px; }
+    .tab-btn, .dashboard-tab-btn {
+        border: 1px solid #d1d9e6; border-radius: 4px; text-align: center; margin-bottom: 5px;
+    }
+    .tab-btn.active, .dashboard-tab-btn.active { border-color: #2c3e50; background: #f8fafc; border-bottom: 1px solid #d1d9e6; }
+
+    .address-box { flex-direction: column; align-items: stretch; }
+    .btn-copy { width: 100%; margin-top: 10px; }
+    
+    .chat-container { width: 95%; height: 80vh; }
 }
