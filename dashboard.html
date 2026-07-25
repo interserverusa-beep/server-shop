@@ -22,7 +22,7 @@
         <div class="dashboard-top-bar">
             <h2>Welcome, <span id="user-email"></span></h2>
             <div class="top-bar-actions">
-                <button onclick="openChat()" class="btn-secondary">💬 Live Support Chat</button>
+                <button onclick="openChat()" class="btn-secondary"> Live Support Chat</button>
                 <button onclick="logout()" class="btn-secondary">Logout</button>
             </div>
         </div>
@@ -162,7 +162,7 @@
             document.querySelector(`.dashboard-tab-btn[data-tab="${tabId}"]`).classList.add('active');
         }
 
-        // Support ticket submission (Frontend simulation)
+        // Support ticket submission
         document.getElementById('support-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const ticketNumber = 'TICKET-' + Math.floor(10000 + Math.random() * 90000);
@@ -172,22 +172,58 @@
             document.getElementById('support-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
 
-        // Servers Data
+        // Servers Data with Pricing
         const servers = [
             { 
-                id: 1, name: '4 x Xeon Platinum 8173M + VPN', processor: 'intel', processorVariant: '4 X XEON', score: 158145,
-                cores: '128 Cores 2 CPU', memory: '256GB Memory', storage: '(12)HDD or (12)SSD or (2)NVMe', network: '80gbps Unmetered',
-                features: ['IPMI Console', 'DDoS Protection'], prices: { '1month': 2487, '6months': 13999, '1year': 25999 } 
+                id: 1, 
+                name: '4 x Xeon Platinum 8173M',
+                processor: 'intel',
+                processorVariant: '4 X XEON',
+                score: 158145,
+                cores: '128 Cores 2 CPU',
+                memory: '256GB Memory',
+                storage: '(12)HDD or (12)SSD or (2)NVMe',
+                network: '80gbps Unmetered',
+                features: ['IPMI Console', 'DDoS Protection'],
+                prices: { 
+                    '1month': 2487, 
+                    '6months': 13999, 
+                    '1year': 25999 
+                } 
             },
             { 
-                id: 2, name: 'AMD RYZEN 9900X + VPN', processor: 'amd', processorVariant: '', score: 127510,
-                cores: '12 Cores Single CPU', memory: '64GB Memory', storage: '(4)HDD or (4)SSD or (2)NVMe', network: '40gbps Unmetered',
-                features: ['IPMI Console', 'DDoS Protection'], prices: { '1month': 2187, '6months': 11999, '1year': 22999 } 
+                id: 2, 
+                name: 'AMD RYZEN 9900X',
+                processor: 'amd',
+                processorVariant: '',
+                score: 127510,
+                cores: '12 Cores Single CPU',
+                memory: '128GB Memory',
+                storage: '(4)HDD or (4)SSD or (2)NVMe',
+                network: '60gbps Unmetered',
+                features: ['IPMI Console', 'DDoS Protection'],
+                prices: { 
+                    '1month': 2287, 
+                    '6months': 12999, 
+                    '1year': 24999 
+                } 
             },
             { 
-                id: 3, name: '4 x Xeon Gold 6230R 8SFF + VPN', processor: 'intel', processorVariant: 'XEON GOLD', score: 186318,
-                cores: '128 Cores 2 CPU', memory: '256GB Memory', storage: '(8)SSD or (2)NVMe', network: '60gbps Unmetered',
-                features: ['IPMI Console', 'DDoS Protection'], prices: { '1month': 2287, '6months': 12199, '1year': 24499 } 
+                id: 3, 
+                name: '2 x Xeon Gold 6230R 8SFF',
+                processor: 'intel',
+                processorVariant: 'XEON GOLD',
+                score: 186318,
+                cores: '128 Cores 4 CPU',
+                memory: '128GB Memory',
+                storage: '(8)SSD or (2)NVMe',
+                network: '40gbps Unmetered',
+                features: ['IPMI Console', 'DDoS Protection'],
+                prices: { 
+                    '1month': 2187, 
+                    '6months': 11999, 
+                    '1year': 23999 
+                } 
             }
         ];
 
@@ -196,60 +232,131 @@
             grid.innerHTML = servers.map(server => `
                 <div class="server-card">
                     <h4>${server.name}</h4>
-                    <div class="processor-logo">${getProcessorLogo(server.processor, server.processorVariant)}</div>
+                    
+                    <div class="processor-logo">
+                        ${getProcessorLogo(server.processor, server.processorVariant)}
+                    </div>
+                    
                     <div class="performance-score">
-                        <div class="score-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6 0 1.66.67 3.16 1.76 4.24l.01.01c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41C8.34 13.99 8 13.04 8 12c0-2.21 1.79-4 4-4 .92 0 1.76.31 2.44.84l5.3-5.3c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-5.3 5.3C15.19 11.69 13.66 12 12 12z" opacity="0.3"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+                        <div class="score-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                <path d="M12 6c-3.31 0-6 2.69-6 6 0 1.66.67 3.16 1.76 4.24l.01.01c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41C8.34 13.99 8 13.04 8 12c0-2.21 1.79-4 4-4 .92 0 1.76.31 2.44.84l5.3-5.3c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-5.3 5.3C15.19 11.69 13.66 12 12 12z" opacity="0.3"/>
+                                <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
                         <div class="score-number">${server.score.toLocaleString()}</div>
                     </div>
+                    
                     <ul class="server-specs">
-                        <li><span class="spec-label">Processor:</span><span class="spec-value">${server.cores}</span></li>
-                        <li><span class="spec-label">Memory:</span><span class="spec-value">${server.memory}</span></li>
-                        <li><span class="spec-label">Storage:</span><span class="spec-value">${server.storage}</span></li>
-                        <li><span class="spec-label">Network:</span><span class="spec-value">${server.network}</span></li>
-                        ${server.features.map(feature => `<li><span class="spec-label">${feature}:</span><span class="spec-value">Included</span></li>`).join('')}
+                        <li>
+                            <span class="spec-label">Processor:</span>
+                            <span class="spec-value">${server.cores}</span>
+                        </li>
+                        <li>
+                            <span class="spec-label">Memory:</span>
+                            <span class="spec-value">${server.memory}</span>
+                        </li>
+                        <li>
+                            <span class="spec-label">Storage:</span>
+                            <span class="spec-value">${server.storage}</span>
+                        </li>
+                        <li>
+                            <span class="spec-label">Network:</span>
+                            <span class="spec-value">${server.network}</span>
+                        </li>
+                        ${server.features.map(feature => `
+                        <li>
+                            <span class="spec-label">${feature}:</span>
+                            <span class="spec-value">Included</span>
+                        </li>
+                        `).join('')}
                     </ul>
-                    <div class="server-price">
-                        <div class="price-label">Cost:</div>
-                        <div class="price-amount"><span class="currency">$</span><span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span><span class="period">/mo</span></div>
-                    </div>
+                    
                     <div class="plan-selector">
-                        <select id="plan-${server.id}" onchange="selectPlan(${server.id})">
-                            <option value="">Select Plan Duration</option>
-                            <option value="1month">1 Month - $${server.prices['1month'].toLocaleString()}</option>
-                            <option value="6months">6 Months - $${server.prices['6months'].toLocaleString()}</option>
-                            <option value="1year">1 Year - $${server.prices['1year'].toLocaleString()}</option>
+                        <label class="plan-label">Select Plan Duration:</label>
+                        <select id="plan-${server.id}" onchange="updatePrice(${server.id})">
+                            <option value="1month">1 Month</option>
+                            <option value="6months">6 Months</option>
+                            <option value="1year">1 Year</option>
                         </select>
                     </div>
-                    <button onclick="proceedToPayment(${server.id})" class="btn-configure">Configure Now!</button>
+                    
+                    <div class="server-price">
+                        <div class="price-label">Cost:</div>
+                        <div class="price-amount">
+                            <span class="currency">$</span>
+                            <span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span>
+                            <span class="period">/mo</span>
+                        </div>
+                        <div class="plan-duration" id="duration-${server.id}">Billed Monthly</div>
+                    </div>
+                    
+                    <button onclick="proceedToPayment(${server.id})" class="btn-configure">
+                        Configure Now!
+                    </button>
                 </div>
             `).join('');
         }
 
         function getProcessorLogo(processor, variant) {
             if (processor === 'intel') {
-                return `<div class="intel-logo"><div class="intel">intel</div><div class="xeon">XEON</div>${variant ? `<div class="variant">${variant}</div>` : ''}</div>`;
+                return `
+                    <div class="intel-logo">
+                        <div class="intel">intel</div>
+                        <div class="xeon">XEON</div>
+                        ${variant ? `<div class="variant">${variant}</div>` : ''}
+                    </div>
+                `;
             } else if (processor === 'amd') {
-                return `<div class="amd-logo"><div class="amd">AMD</div><div class="ryzen">RYZEN</div></div>`;
+                return `
+                    <div class="amd-logo">
+                        <div class="amd">AMD</div>
+                        <div class="ryzen">RYZEN</div>
+                    </div>
+                `;
             }
             return '';
         }
 
-        function selectPlan(serverId) {
+        function updatePrice(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
+            
             if (plan && server) {
-                document.getElementById(`price-${serverId}`).textContent = server.prices[plan].toLocaleString();
+                const price = server.prices[plan];
+                document.getElementById(`price-${serverId}`).textContent = price.toLocaleString();
+                
+                // Update duration text
+                let durationText = 'Billed Monthly';
+                if (plan === '6months') durationText = 'Billed Every 6 Months';
+                if (plan === '1year') durationText = 'Billed Annually';
+                document.getElementById(`duration-${serverId}`).textContent = durationText;
+                
                 sessionStorage.setItem(`selected-plan-${serverId}`, plan);
             }
         }
 
         function proceedToPayment(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
-            if (!plan) { alert('Please select a plan duration'); return; }
             const server = servers.find(s => s.id === serverId);
-            sessionStorage.setItem('selected-server', JSON.stringify(server));
+            
+            if (!plan || !server) {
+                alert('Please select a valid server and plan');
+                return;
+            }
+            
+            const price = server.prices[plan];
+            
+            // Store server info with plan details
+            sessionStorage.setItem('selected-server', JSON.stringify({
+                ...server,
+                selectedPlan: plan,
+                selectedPrice: price
+            }));
             sessionStorage.setItem('selected-plan', plan);
-            sessionStorage.setItem('selected-price', server.prices[plan]);
+            sessionStorage.setItem('selected-price', price);
+            
             window.location.href = 'payment.html';
         }
 
@@ -257,9 +364,7 @@
             auth.signOut().then(() => { window.location.href = 'login.html'; });
         }
 
-        // ==========================================
-        // LIVE CHAT FUNCTIONS
-        // ==========================================
+        // Live Chat Functions
         function openChat() {
             document.getElementById('chat-modal').style.display = 'flex';
             loadChatMessages();
@@ -267,11 +372,11 @@
 
         function closeChat() {
             document.getElementById('chat-modal').style.display = 'none';
-            if (chatUnsubscribe) { chatUnsubscribe(); }
+            if (chatUnsubscribe) chatUnsubscribe();
         }
 
         function handleChatKeyPress(event) {
-            if (event.key === 'Enter') { sendMessage(); }
+            if (event.key === 'Enter') sendMessage();
         }
 
         async function loadChatMessages() {
@@ -336,4 +441,4 @@
         });
     </script>
 </body>
-</html>
+</html>پ
