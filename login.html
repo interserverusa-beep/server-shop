@@ -16,11 +16,12 @@
 </head>
 <body>
     <div class="login-container">
-                <!-- Animated Logo -->
+        <!-- Animated Logo (Updated with Image) -->
         <div class="site-logo">
-            <span class="logo-icon">🚀</span>
+            <img src="images/logo.png" alt="Server Shop Logo" class="logo-image">
             <span class="logo-text">Server Shop</span>
         </div>
+        
         <h2>Login / Sign Up</h2>
         
         <!-- Step 1: Email & Password -->
@@ -73,7 +74,7 @@
         // 2. Check auth state
         auth.onAuthStateChanged((user) => {
             if (user) {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'index.html'; // Redirect to main dashboard page
             }
         });
 
@@ -110,7 +111,7 @@
                 await db.collection('verification_codes').doc(email).set({
                     code: generatedCode,
                     email: email,
-                    password: password, // Note: For production, never store plain passwords!
+                    password: password, 
                     expiresAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 10 * 60 * 1000)),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -134,9 +135,7 @@
                 showMessage('Verification code sent! Check your email (and Spam folder).', 'green');
 
             } catch (error) {
-                console.error("❌ FULL ERROR OBJECT:", error); // This will show the real error in F12
-                
-                // Safe error message extraction
+                console.error("❌ FULL ERROR OBJECT:", error);
                 const errorMsg = error.message || error.toString() || JSON.stringify(error) || 'An unknown error occurred.';
                 showMessage('Error: ' + errorMsg, 'red');
             } finally {
@@ -184,13 +183,13 @@
                     await auth.signInWithEmailAndPassword(currentUserEmail, currentUserPassword);
                     showMessage('Login successful! Redirecting...', 'green');
                     await db.collection('verification_codes').doc(currentUserEmail).delete(); // Clean up
-                    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+                    setTimeout(() => window.location.href = 'index.html', 1000);
                 } catch (authError) {
                     if (authError.code === 'auth/user-not-found') {
                         await auth.createUserWithEmailAndPassword(currentUserEmail, currentUserPassword);
                         showMessage('Account created successfully! Redirecting...', 'green');
                         await db.collection('verification_codes').doc(currentUserEmail).delete();
-                        setTimeout(() => window.location.href = 'dashboard.html', 1000);
+                        setTimeout(() => window.location.href = 'index.html', 1000);
                     } else {
                         throw authError;
                     }
