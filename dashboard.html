@@ -203,15 +203,37 @@
         function updatePrice(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
-            document.getElementById(`price-${serverId}`).textContent = server.prices[plan].toLocaleString();
+            const price = server.prices[plan];
+            
+            const priceElement = document.getElementById(`price-${serverId}`);
+            const periodElement = priceElement.nextElementSibling; // .period element
+            
+            priceElement.textContent = price.toLocaleString();
+            
+            // Update period text based on plan
+            if (plan === '1month') {
+                periodElement.textContent = '.00 /mo';
+            } else if (plan === '6months') {
+                periodElement.textContent = '.00 /6mo';
+            } else if (plan === '1year') {
+                periodElement.textContent = '.00 /year';
+            }
         }
-
+        
         function configureServer(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
-            sessionStorage.setItem('selected-server', JSON.stringify(server));
+            const price = server.prices[plan];
+            
+            // Store server info with plan details
+            sessionStorage.setItem('selected-server', JSON.stringify({
+                ...server,
+                selectedPlan: plan,
+                selectedPrice: price
+            }));
             sessionStorage.setItem('selected-plan', plan);
-            sessionStorage.setItem('selected-price', server.prices[plan]);
+            sessionStorage.setItem('selected-price', price);
+            
             window.location.href = 'payment.html';
         }
 
