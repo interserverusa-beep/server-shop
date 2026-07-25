@@ -11,70 +11,71 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     
-    <!-- EmailJS SDK (Version 3 for maximum compatibility) -->
+    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
-<body>
+<body class="login-page">
     <div class="login-container">
-        <!-- Animated Logo (Updated with Image) -->
+        <!-- Animated Logo -->
         <div class="site-logo">
             <img src="images/logo.png" alt="Server Shop Logo" class="logo-image">
             <span class="logo-text">Server Shop</span>
         </div>
         
-        <h2>Login / Sign Up</h2>
+        <h2 style="color: #1a3a5c; margin-bottom: 10px;">Login / Sign Up</h2>
+        <p style="color: #5a6b7c; margin-bottom: 30px;">Enter your credentials to access your account</p>
         
         <!-- Step 1: Email & Password -->
         <div id="step1">
             <div class="form-group">
-                <label>Email Address</label>
+                <label style="text-align: left; display: block; margin-bottom: 8px; font-weight: 600; color: #1a3a5c;">Email Address</label>
                 <input type="email" id="email" placeholder="your@email.com" required>
             </div>
             
             <div class="form-group">
-                <label>Password</label>
+                <label style="text-align: left; display: block; margin-bottom: 8px; font-weight: 600; color: #1a3a5c;">Password</label>
                 <input type="password" id="password" placeholder="Enter your password" required>
             </div>
             
-            <button onclick="sendVerificationCode()" class="btn-primary" id="send-btn">
+            <button onclick="sendVerificationCode()" class="btn-primary" id="send-btn" style="width: 100%; margin: 20px 0 10px 0;">
                 📧 Send Verification Code
             </button>
         </div>
 
         <!-- Step 2: Verification Code -->
         <div id="step2" style="display: none;">
-            <p style="color: #666; margin-bottom: 20px;">
-                A verification code has been sent to <strong id="display-email"></strong>
+            <p style="color: #5a6b7c; margin-bottom: 25px; font-size: 15px;">
+                A verification code has been sent to <strong id="display-email" style="color: #0070cc;"></strong>
             </p>
             
             <div class="form-group">
-                <label>Verification Code</label>
-                <input type="text" id="verification-code" placeholder="Enter 6-digit code" maxlength="6" required>
+                <label style="text-align: left; display: block; margin-bottom: 8px; font-weight: 600; color: #1a3a5c;">Verification Code</label>
+                <input type="text" id="verification-code" placeholder="Enter 6-digit code" maxlength="6" required style="text-align: center; font-size: 24px; letter-spacing: 5px;">
             </div>
             
-            <button onclick="verifyCode()" class="btn-primary" id="verify-btn">
+            <button onclick="verifyCode()" class="btn-primary" id="verify-btn" style="width: 100%; margin: 20px 0 10px 0;">
                 ✓ Verify & Login
             </button>
             
-            <button onclick="resendCode()" class="btn-secondary" style="margin-top: 10px;">
+            <button onclick="resendCode()" class="btn-secondary" style="width: 100%; margin-top: 10px;">
                 🔄 Resend Code
             </button>
         </div>
         
-        <p id="message" style="margin-top: 15px; font-weight: bold;"></p>
+        <p id="message" style="margin-top: 20px; font-weight: 600; font-size: 15px;"></p>
     </div>
 
     <script src="firebase-config.js"></script>
     <script>
-        // 1. Initialize EmailJS
+        // Initialize EmailJS
         (function() {
-            emailjs.init("zT9odo_BZdPqwVm4B"); // Your Public Key
+            emailjs.init("zT9odo_BZdPqwVm4B");
         })();
 
-        // 2. Check auth state
+        // Check auth state
         auth.onAuthStateChanged((user) => {
             if (user) {
-                window.location.href = 'index.html'; // Redirect to main dashboard page
+                window.location.href = 'dashboard.html';
             }
         });
 
@@ -82,11 +83,11 @@
         let currentUserPassword = '';
         let generatedCode = '';
 
-        // Helper function to show messages safely
         function showMessage(text, color) {
             const msgEl = document.getElementById('message');
             msgEl.style.color = color;
             msgEl.textContent = text;
+            msgEl.style.animation = 'slideUp 0.4s ease-out';
         }
 
         async function sendVerificationCode() {
@@ -95,71 +96,65 @@
             const sendBtn = document.getElementById('send-btn');
 
             if (!email || !password) {
-                showMessage('Please enter both email and password.', 'red');
+                showMessage('Please enter both email and password.', '#c0392b');
                 return;
             }
 
-            showMessage('Sending verification code...', 'blue');
-            sendBtn.disabled = true; // Prevent double clicks
+            showMessage('Sending verification code...', '#0070cc');
+            sendBtn.disabled = true;
 
             generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
             currentUserEmail = email;
             currentUserPassword = password;
 
             try {
-                // A. Save to Firestore
                 await db.collection('verification_codes').doc(email).set({
                     code: generatedCode,
                     email: email,
-                    password: password, 
+                    password: password,
                     expiresAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 10 * 60 * 1000)),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                console.log("✅ Code saved to Firestore successfully.");
 
-                // B. Send Email via EmailJS
-                const emailResponse = await emailjs.send(
-                    'service_00kjwnk',     // Your Service ID
-                    'template_oyd8k5w',    // Your Template ID
+                await emailjs.send(
+                    'service_00kjwnk',
+                    'template_oyd8k5w',
                     {
                         to_email: email,
                         code: generatedCode
                     }
                 );
-                console.log("✅ Email sent successfully:", emailResponse);
 
-                // C. Update UI
                 document.getElementById('step1').style.display = 'none';
                 document.getElementById('step2').style.display = 'block';
                 document.getElementById('display-email').textContent = email;
-                showMessage('Verification code sent! Check your email (and Spam folder).', 'green');
+                showMessage('Verification code sent! Check your email.', '#27ae60');
 
             } catch (error) {
-                console.error("❌ FULL ERROR OBJECT:", error);
-                const errorMsg = error.message || error.toString() || JSON.stringify(error) || 'An unknown error occurred.';
-                showMessage('Error: ' + errorMsg, 'red');
+                console.error("Error:", error);
+                showMessage('Error: ' + (error.message || 'Failed to send code'), '#c0392b');
             } finally {
                 sendBtn.disabled = false;
             }
         }
 
-                async function verifyCode() {
+        async function verifyCode() {
             const enteredCode = document.getElementById('verification-code').value.trim();
             const verifyBtn = document.getElementById('verify-btn');
 
             if (!enteredCode) {
-                showMessage('Please enter the verification code.', 'red');
+                showMessage('Please enter the verification code.', '#c0392b');
                 return;
             }
 
-            showMessage('Verifying...', 'blue');
+            showMessage('Verifying...', '#0070cc');
             verifyBtn.disabled = true;
 
             try {
                 const codeDoc = await db.collection('verification_codes').doc(currentUserEmail).get();
                 
                 if (!codeDoc.exists) {
-                    showMessage('Code not found. Please request a new code.', 'red');
+                    showMessage('Code not found. Please request a new code.', '#c0392b');
                     verifyBtn.disabled = false;
                     return;
                 }
@@ -167,56 +162,51 @@
                 const codeData = codeDoc.data();
 
                 if (codeData.expiresAt.toDate() < new Date()) {
-                    showMessage('Code expired. Please request a new code.', 'red');
+                    showMessage('Code expired. Please request a new code.', '#c0392b');
                     verifyBtn.disabled = false;
                     return;
                 }
 
                 if (codeData.code !== enteredCode) {
-                    showMessage('Invalid verification code. Please check and try again.', 'red');
+                    showMessage('Invalid verification code.', '#c0392b');
                     verifyBtn.disabled = false;
                     return;
                 }
 
-                // Code is valid! Proceed with Firebase Auth
                 try {
-                    // 1. ابتدا سعی می‌کنیم کاربر را وارد کنیم
                     await auth.signInWithEmailAndPassword(currentUserEmail, currentUserPassword);
-                    showMessage('Login successful! Redirecting...', 'green');
-                    await db.collection('verification_codes').doc(currentUserEmail).delete(); // پاکسازی کد
-                    setTimeout(() => window.location.href = 'index.html', 1000);
+                    showMessage('Login successful! Redirecting...', '#27ae60');
+                    await db.collection('verification_codes').doc(currentUserEmail).delete();
+                    setTimeout(() => window.location.href = 'dashboard.html', 1000);
                     
                 } catch (authError) {
-                    // 2. اگر خطا داد، ممکن است کاربر جدید باشد (به دلیل فعال بودن Email enumeration protection در فایربیس)
-                    // بنابراین سعی می‌کنیم اکانت را بسازیم.
                     if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-login-credentials') {
                         try {
                             await auth.createUserWithEmailAndPassword(currentUserEmail, currentUserPassword);
-                            showMessage('Account created successfully! Redirecting...', 'green');
+                            showMessage('Account created successfully! Redirecting...', '#27ae60');
                             await db.collection('verification_codes').doc(currentUserEmail).delete();
-                            setTimeout(() => window.location.href = 'index.html', 1000);
+                            setTimeout(() => window.location.href = 'dashboard.html', 1000);
                         } catch (createError) {
-                            // 3. اگر اکانت از قبل با رمز عبور متفاوتی وجود داشته باشد
                             if (createError.code === 'auth/email-already-in-use') {
-                                showMessage('This email is already registered with a different password.', 'red');
+                                showMessage('This email is already registered.', '#c0392b');
                             } else {
-                                showMessage('Registration error: ' + createError.message, 'red');
+                                showMessage('Registration error: ' + createError.message, '#c0392b');
                             }
                         }
                     } else {
-                        showMessage('Login error: ' + authError.message, 'red');
+                        showMessage('Login error: ' + authError.message, '#c0392b');
                     }
                 }
 
             } catch (error) {
-                console.error("❌ FULL VERIFY ERROR:", error);
-                const errorMsg = error.message || error.toString() || 'Verification failed.';
-                showMessage('Error: ' + errorMsg, 'red');
+                console.error("Error:", error);
+                showMessage('Error: ' + (error.message || 'Verification failed'), '#c0392b');
                 verifyBtn.disabled = false;
             }
         }
+
         async function resendCode() {
-            showMessage('Resending code...', 'blue');
+            showMessage('Resending code...', '#0070cc');
             await sendVerificationCode();
         }
     </script>
