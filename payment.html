@@ -13,11 +13,12 @@
 </head>
 <body>
     <div class="payment-container" id="main-container">
-                <!-- Animated Logo -->
+        <!-- Animated Logo (Updated with Image) -->
         <div class="site-logo">
-            <span class="logo-icon">🚀</span>
+            <img src="images/logo.png" alt="Server Shop Logo" class="logo-image">
             <span class="logo-text">Server Shop</span>
         </div>
+        
         <h2>💳 Checkout</h2>
         
         <div class="invoice" id="invoice">
@@ -160,7 +161,7 @@
             <h3>Transaction Submitted!</h3>
             <p>Your transaction will be reviewed and upon confirmation, an email containing the details of your purchased server will be sent to you.</p>
             <p class="highlight-text">This process may take <strong>2 to 30 minutes</strong> depending on network congestion. Please be patient.</p>
-            <button onclick="window.location.href='dashboard.html'" class="btn-primary">Back to Dashboard</button>
+            <button onclick="window.location.href='index.html'" class="btn-primary">Back to Dashboard</button>
         </div>
     </div>
 
@@ -192,7 +193,7 @@
 
             if (!server || !price) {
                 alert('No order found. Redirecting to dashboard...');
-                window.location.href = 'dashboard.html';
+                window.location.href = 'index.html';
                 return;
             }
 
@@ -223,7 +224,6 @@
             if (btnElement) {
                 btnElement.classList.add('active');
             } else {
-                // Fallback if called programmatically
                 const buttons = document.querySelectorAll('.tab-btn');
                 if (tabName === 'card') buttons[0].classList.add('active');
                 if (tabName === 'paypal') buttons[1].classList.add('active');
@@ -362,7 +362,7 @@
             document.getElementById('invoice').style.display = 'block';
             document.getElementById('payment-tabs').style.display = 'flex';
             
-            // Restore the EXACT tab the user was on, do NOT force back to 'card'
+            // Restore the EXACT tab the user was on
             const buttons = document.querySelectorAll('.tab-btn');
             let btnToPass = buttons[0]; // default
             if (currentActiveTab === 'paypal') btnToPass = buttons[1];
