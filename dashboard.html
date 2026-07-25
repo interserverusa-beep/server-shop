@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header with Logo -->
     <header class="site-header">
         <div class="header-container">
             <div class="logo">
@@ -20,11 +20,12 @@
                 <span class="logo-text">Server Shop</span>
             </div>
             
+            <!-- Responsive Tabs Navigation -->
             <nav class="main-nav">
-                <button class="nav-btn active" onclick="switchTab('servers')">Servers</button>
-                <button class="nav-btn" onclick="switchTab('live-support')">Live Support</button>
-                <button class="nav-btn" onclick="switchTab('purchase-history')">Purchase History</button>
-                <button class="nav-btn" onclick="switchTab('support-ticket')">Support Ticket</button>
+                <button class="nav-btn active" onclick="switchTab('servers', this)">Servers</button>
+                <button class="nav-btn" onclick="switchTab('live-support', this)">Live Support</button>
+                <button class="nav-btn" onclick="switchTab('purchase-history', this)">Purchase History</button>
+                <button class="nav-btn" onclick="switchTab('support-ticket', this)">Support Ticket</button>
             </nav>
             
             <div class="header-actions">
@@ -34,7 +35,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <main class="main-content">
         <!-- Servers Tab -->
         <div id="servers" class="tab-content active">
@@ -53,7 +54,9 @@
             </div>
             <div class="chat-container-main">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="welcome-message"><p>Welcome to our support chat! How can we help you today?</p></div>
+                    <div class="welcome-message">
+                        <p>Welcome to our support chat! How can we help you today?</p>
+                    </div>
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
@@ -73,7 +76,7 @@
                     <div class="empty-icon">📭</div>
                     <h3>No Orders Yet</h3>
                     <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
-                    <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
+                    <button onclick="switchTab('servers', document.querySelector('.nav-btn'))" class="btn-primary">Browse Servers</button>
                 </div>
             </div>
         </div>
@@ -134,28 +137,69 @@
             }
         });
 
-        // Tab Switching (FIXED BUG)
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-                // Find the button that calls this tabId and activate it
-                if (btn.getAttribute('onclick').includes(`'${tabId}'`)) {
-                    btn.classList.add('active');
-                }
+        // Tab Switching Function
+        function switchTab(tabId, btnElement) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
             });
             
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            
+            // Load chat if switching to live support
             if (tabId === 'live-support') {
                 loadChatMessages();
             }
         }
 
+        // Servers Data
         const servers = [
-            { id: 1, name: '4 x Xeon Platinum 8173M + VPN', processor: 'intel', variant: '4 X XEON', score: 158145, cores: '128 Cores 4 CPU', memory: '128GB Memory', storage: '(12)HDD or (12)SSD or (2)NVMe', network: '80gbps Unmetered', prices: { '1month': 2487, '6months': 13999, '1year': 25999 } },
-            { id: 2, name: 'AMD RYZEN 9900X + VPN', processor: 'amd', variant: '', score: 127510, cores: '12 Cores Single CPU', memory: '128GB Memory', storage: '(4)HDD or (4)SSD or (2)NVMe', network: '80gbps Unmetered', prices: { '1month': 2287, '6months': 12999, '1year': 24999 } },
-            { id: 3, name: '2 x Xeon Gold 6230R 8SFF +VPN', processor: 'intel', variant: 'XEON GOLD', score: 186318, cores: '52 Cores 2 CPU', memory: '128GB Memory', storage: '(8)SSD or (2)NVMe', network: '40gbps Unmetered', prices: { '1month': 2187, '6months': 11999, '1year': 23999 } }
+            { 
+                id: 1, 
+                name: '4 x Xeon Platinum 8173M +VPN',
+                processor: 'intel',
+                variant: '4 X XEON',
+                score: 158145,
+                cores: '128 Cores 4 CPU',
+                memory: '128GB Memory',
+                storage: '(12)HDD or (12)SSD or (2)NVMe',
+                network: '80gbps Unmetered',
+                prices: { '1month': 2487, '6months': 13999, '1year': 25999 } 
+            },
+            { 
+                id: 2, 
+                name: 'AMD RYZEN 9900X +VPN',
+                processor: 'amd',
+                variant: '',
+                score: 127510,
+                cores: '12 Cores Single CPU',
+                memory: '128GB Memory',
+                storage: '(4)HDD or (4)SSD or (2)NVMe',
+                network: '80gbps Unmetered',
+                prices: { '1month': 2287, '6months': 12999, '1year': 24999 } 
+            },
+            { 
+                id: 3, 
+                name: '2 x Xeon Gold 6230R 8SFF +VPN',
+                processor: 'intel',
+                variant: 'XEON GOLD',
+                score: 186318,
+                cores: '52 Cores 2 CPU',
+                memory: '128GB Memory',
+                storage: '(8)SSD or (2)NVMe',
+                network: '40gbps Unmetered',
+                prices: { '1month': 2187, '6months': 11999, '1year': 23999 } 
+            }
         ];
 
         function loadServers() {
@@ -165,7 +209,10 @@
                     <h2>${server.name}</h2>
                     <div class="processor-logo">${getProcessorLogo(server.processor, server.variant)}</div>
                     <div class="benchmark">
-                        <svg class="speed-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        <svg class="speed-icon" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
                         <span class="benchmark-score">${server.score.toLocaleString()}</span>
                     </div>
                     <ul class="specs-list">
@@ -186,7 +233,11 @@
                     </div>
                     <div class="price-display">
                         <span class="price-label">Cost:</span>
-                        <span class="price-amount"><span class="currency">$</span><span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span><span class="period">.00 /mo</span></span>
+                        <span class="price-amount">
+                            <span class="currency">$</span>
+                            <span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span>
+                            <span class="period" id="period-${server.id}">.00 /mo</span>
+                        </span>
                     </div>
                     <button onclick="configureServer(${server.id})" class="btn-configure">Configure Now!</button>
                 </div>
@@ -205,12 +256,9 @@
             const server = servers.find(s => s.id === serverId);
             const price = server.prices[plan];
             
-            const priceElement = document.getElementById(`price-${serverId}`);
-            const periodElement = priceElement.nextElementSibling; // .period element
+            document.getElementById(`price-${serverId}`).textContent = price.toLocaleString();
             
-            priceElement.textContent = price.toLocaleString();
-            
-            // Update period text based on plan
+            const periodElement = document.getElementById(`period-${serverId}`);
             if (plan === '1month') {
                 periodElement.textContent = '.00 /mo';
             } else if (plan === '6months') {
@@ -219,42 +267,55 @@
                 periodElement.textContent = '.00 /year';
             }
         }
-        
+
         function configureServer(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
             const price = server.prices[plan];
             
-            // Store server info with plan details
-            sessionStorage.setItem('selected-server', JSON.stringify({
-                ...server,
-                selectedPlan: plan,
-                selectedPrice: price
-            }));
+            sessionStorage.setItem('selected-server', JSON.stringify(server));
             sessionStorage.setItem('selected-plan', plan);
             sessionStorage.setItem('selected-price', price);
             
             window.location.href = 'payment.html';
         }
 
+        // Live Chat Functions
         function loadChatMessages() {
             if (!currentUser || chatUnsubscribe) return;
+            
             const container = document.getElementById('chat-messages');
-            container.innerHTML = '<div class="loading">Loading messages...</div>';
+            container.innerHTML = '<div class="loading" style="text-align:center;padding:40px;">Loading messages...</div>';
 
             chatUnsubscribe = db.collection('chats').doc(currentUser.uid).collection('messages')
-                .orderBy('timestamp', 'asc').limit(50)
+                .orderBy('timestamp', 'asc')
+                .limit(50)
                 .onSnapshot((snapshot) => {
                     container.innerHTML = '';
+                    
                     if (snapshot.empty) {
-                        container.innerHTML = '<div class="welcome-message"><p>Welcome to our support chat! How can we help you today?</p></div>';
+                        container.innerHTML = `
+                            <div class="welcome-message">
+                                <p>Welcome to our support chat! How can we help you today?</p>
+                            </div>
+                        `;
                         return;
                     }
+
                     snapshot.forEach((doc) => {
                         const msg = doc.data();
                         const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                        container.innerHTML += `<div class="chat-message ${msg.sender}"><div class="message-bubble">${msg.text}</div><div class="message-time">${time}</div></div>`;
+                        
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `chat-message ${msg.sender}`;
+                        messageDiv.innerHTML = `
+                            <div class="message-bubble">${msg.text}</div>
+                            <div class="message-time">${time}</div>
+                        `;
+                        
+                        container.appendChild(messageDiv);
                     });
+
                     container.scrollTop = container.scrollHeight;
                 });
         }
@@ -266,12 +327,18 @@
 
             try {
                 await db.collection('chats').doc(currentUser.uid).set({
-                    userEmail: currentUser.email, lastMessage: text, lastUpdated: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
+                    userEmail: currentUser.email,
+                    lastMessage: text,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
                 }, { merge: true });
 
                 await db.collection('chats').doc(currentUser.uid).collection('messages').add({
-                    sender: 'user', text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    sender: 'user',
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
                 input.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -280,28 +347,37 @@
         }
 
         function handleChatKeyPress(event) {
-            if (event.key === 'Enter') sendMessage();
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         }
 
+        // Support Ticket Functions
         async function submitTicket(event) {
             event.preventDefault();
             if (!currentUser) return;
             
             try {
                 const ticketNumber = 'TICKET-' + Math.floor(100000 + Math.random() * 900000);
+                
                 await db.collection('tickets').add({
-                    userId: currentUser.uid, userEmail: currentUser.email, ticketNumber: ticketNumber,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    ticketNumber: ticketNumber,
                     subject: document.getElementById('ticket-subject').value,
                     priority: document.getElementById('ticket-priority').value,
                     message: document.getElementById('ticket-message').value,
-                    status: 'open', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    status: 'open',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
                 document.getElementById('ticket-number').textContent = ticketNumber;
                 document.getElementById('ticket-form').style.display = 'none';
                 document.getElementById('ticket-success').style.display = 'block';
+                
             } catch (error) {
                 console.error('Error submitting ticket:', error);
-                alert('Failed to submit ticket.');
+                alert('Failed to submit ticket. Please try again.');
             }
         }
 
@@ -311,37 +387,59 @@
             document.getElementById('ticket-success').style.display = 'none';
         }
 
+        // Load Orders
         async function loadOrders() {
             if (!currentUser) return;
+            
             try {
-                const snapshot = await db.collection('orders').where('userId', '==', currentUser.uid).orderBy('timestamp', 'desc').get();
+                const snapshot = await db.collection('orders')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
                 const ordersList = document.getElementById('orders-list');
                 
                 if (snapshot.empty) {
-                    ordersList.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No Orders Yet</h3><p>You haven't purchased any servers yet.</p><button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button></div>`;
+                    ordersList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <h3>No Orders Yet</h3>
+                            <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
+                            <button onclick="switchTab('servers', document.querySelector('.nav-btn'))" class="btn-primary">Browse Servers</button>
+                        </div>
+                    `;
                     return;
                 }
                 
                 ordersList.innerHTML = snapshot.docs.map(doc => {
                     const order = doc.data();
                     const date = order.timestamp ? order.timestamp.toDate().toLocaleDateString() : 'N/A';
-                    return `<div class="order-card">
-                        <div class="order-header"><h3>${order.serverName || 'Server Order'}</h3><span class="order-status ${order.status}">${order.status || 'pending'}</span></div>
-                        <div class="order-details">
-                            <p><strong>Plan:</strong> ${order.plan || 'N/A'}</p>
-                            <p><strong>Price:</strong> $${order.price ? order.price.toLocaleString() : '0'}</p>
-                            <p><strong>Date:</strong> ${date}</p>
-                            ${order.transactionHash ? `<p><strong>TX Hash:</strong> <code>${order.transactionHash}</code></p>` : ''}
+                    
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <h3>${order.serverName || 'Server Order'}</h3>
+                                <span class="order-status ${order.status}">${order.status || 'pending'}</span>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Plan:</strong> ${order.plan || 'N/A'}</p>
+                                <p><strong>Price:</strong> $${order.price ? order.price.toLocaleString() : '0'}</p>
+                                <p><strong>Date:</strong> ${date}</p>
+                                ${order.transactionHash ? `<p><strong>TX Hash:</strong> <code>${order.transactionHash}</code></p>` : ''}
+                            </div>
                         </div>
-                    </div>`;
+                    `;
                 }).join('');
+                
             } catch (error) {
                 console.error('Error loading orders:', error);
             }
         }
 
         function logout() {
-            auth.signOut().then(() => { window.location.href = 'login.html'; });
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
         }
     </script>
 </body>
