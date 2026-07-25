@@ -42,10 +42,7 @@
                 <h1>40GBPS Dedicated Servers</h1>
                 <p>InterServer delivers optimal performance with our 40Gbps servers, providing a balance of speed and reliability.</p>
             </div>
-            
-            <div class="servers-grid" id="servers-grid">
-                <!-- Servers will be loaded here -->
-            </div>
+            <div class="servers-grid" id="servers-grid"></div>
         </div>
 
         <!-- Live Support Tab -->
@@ -54,14 +51,10 @@
                 <h1>💬 Live Support Chat</h1>
                 <p>Chat with our support team in real-time</p>
             </div>
-            
             <div class="chat-container-main">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="welcome-message">
-                        <p>Welcome to our support chat! How can we help you today?</p>
-                    </div>
+                    <div class="welcome-message"><p>Welcome to our support chat! How can we help you today?</p></div>
                 </div>
-                
                 <div class="chat-input-area">
                     <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
                     <button onclick="sendMessage()" class="btn-send">Send</button>
@@ -75,10 +68,9 @@
                 <h1>📦 Purchase History</h1>
                 <p>View your server purchase history</p>
             </div>
-            
             <div class="orders-list" id="orders-list">
                 <div class="empty-state">
-                    <div class="empty-icon"></div>
+                    <div class="empty-icon">📭</div>
                     <h3>No Orders Yet</h3>
                     <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
                     <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
@@ -89,17 +81,15 @@
         <!-- Support Ticket Tab -->
         <div id="support-ticket" class="tab-content">
             <div class="page-header">
-                <h1> Submit Support Ticket</h1>
+                <h1>📩 Submit Support Ticket</h1>
                 <p>Create a ticket for technical assistance</p>
             </div>
-            
             <div class="ticket-form-container">
                 <form id="ticket-form" onsubmit="submitTicket(event)">
                     <div class="form-group">
                         <label for="ticket-subject">Subject *</label>
                         <input type="text" id="ticket-subject" placeholder="Brief description of your issue" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="ticket-priority">Priority</label>
                         <select id="ticket-priority">
@@ -109,12 +99,10 @@
                             <option value="urgent">Urgent</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label for="ticket-message">Message *</label>
                         <textarea id="ticket-message" rows="8" placeholder="Please describe your issue in detail..." required></textarea>
                     </div>
-                    
                     <button type="submit" class="btn-submit-ticket">Submit Ticket</button>
                 </form>
                 
@@ -146,69 +134,28 @@
             }
         });
 
-        // Tab Switching
+        // Tab Switching (FIXED BUG)
         function switchTab(tabId) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             
-            // Update nav buttons
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
+                // Find the button that calls this tabId and activate it
+                if (btn.getAttribute('onclick').includes(`'${tabId}'`)) {
+                    btn.classList.add('active');
+                }
             });
-            event.target.classList.add('active');
             
-            // Load chat if switching to live support
             if (tabId === 'live-support') {
                 loadChatMessages();
             }
         }
 
-        // Servers Data
         const servers = [
-            { 
-                id: 1, 
-                name: '4 x Xeon Platinum 8173M',
-                processor: 'intel',
-                variant: '4 X XEON',
-                score: 158145,
-                cores: '128 Cores 4 CPU',
-                memory: '128GB Memory',
-                storage: '(12)HDD or (12)SSD or (2)NVMe',
-                network: '80gbps Unmetered',
-                features: ['IPMI Console', 'DDoS Protection'],
-                prices: { '1month': 2487, '6months': 13999, '1year': 25999 } 
-            },
-            { 
-                id: 2, 
-                name: 'AMD RYZEN 9900X',
-                processor: 'amd',
-                variant: '',
-                score: 127510,
-                cores: '12 Cores Single CPU',
-                memory: '128GB Memory',
-                storage: '(4)HDD or (4)SSD or (2)NVMe',
-                network: '80gbps Unmetered',
-                features: ['IPMI Console', 'DDoS Protection'],
-                prices: { '1month': 2287, '6months': 12999, '1year': 24999 } 
-            },
-            { 
-                id: 3, 
-                name: '2 x Xeon Gold 6230R 8SFF',
-                processor: 'intel',
-                variant: 'XEON GOLD',
-                score: 186318,
-                cores: '52 Cores 2 CPU',
-                memory: '128GB Memory',
-                storage: '(8)SSD or (2)NVMe',
-                network: '40gbps Unmetered',
-                features: ['IPMI Console', 'DDoS Protection'],
-                prices: { '1month': 2187, '6months': 11999, '1year': 23999 } 
-            }
+            { id: 1, name: '4 x Xeon Platinum 8173M + VPN', processor: 'intel', variant: '4 X XEON', score: 158145, cores: '128 Cores 4 CPU', memory: '128GB Memory', storage: '(12)HDD or (12)SSD or (2)NVMe', network: '80gbps Unmetered', prices: { '1month': 2487, '6months': 13999, '1year': 25999 } },
+            { id: 2, name: 'AMD RYZEN 9900X + VPN', processor: 'amd', variant: '', score: 127510, cores: '12 Cores Single CPU', memory: '128GB Memory', storage: '(4)HDD or (4)SSD or (2)NVMe', network: '80gbps Unmetered', prices: { '1month': 2287, '6months': 12999, '1year': 24999 } },
+            { id: 3, name: '2 x Xeon Gold 6230R 8SFF +VPN', processor: 'intel', variant: 'XEON GOLD', score: 186318, cores: '52 Cores 2 CPU', memory: '128GB Memory', storage: '(8)SSD or (2)NVMe', network: '40gbps Unmetered', prices: { '1month': 2187, '6months': 11999, '1year': 23999 } }
         ];
 
         function loadServers() {
@@ -216,19 +163,11 @@
             grid.innerHTML = servers.map(server => `
                 <div class="server-card">
                     <h2>${server.name}</h2>
-                    
-                    <div class="processor-logo">
-                        ${getProcessorLogo(server.processor, server.variant)}
-                    </div>
-                    
+                    <div class="processor-logo">${getProcessorLogo(server.processor, server.variant)}</div>
                     <div class="benchmark">
-                        <svg class="speed-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                            <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                        </svg>
+                        <svg class="speed-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                         <span class="benchmark-score">${server.score.toLocaleString()}</span>
                     </div>
-                    
                     <ul class="specs-list">
                         <li><span class="spec-label">Processor:</span> <span class="spec-value">${server.cores}</span></li>
                         <li><span class="spec-label">Memory:</span> <span class="spec-value">${server.memory}</span></li>
@@ -237,7 +176,6 @@
                         <li><span class="spec-label">IPMI Console:</span> <span class="spec-value">Included</span></li>
                         <li><span class="spec-label">DDoS Protection:</span> <span class="spec-value">Included</span></li>
                     </ul>
-                    
                     <div class="plan-selector">
                         <label>Select Plan:</label>
                         <select id="plan-${server.id}" onchange="updatePrice(${server.id})">
@@ -246,16 +184,10 @@
                             <option value="1year">1 Year</option>
                         </select>
                     </div>
-                    
                     <div class="price-display">
                         <span class="price-label">Cost:</span>
-                        <span class="price-amount">
-                            <span class="currency">$</span>
-                            <span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span>
-                            <span class="period">.00 /mo</span>
-                        </span>
+                        <span class="price-amount"><span class="currency">$</span><span id="price-${server.id}">${server.prices['1month'].toLocaleString()}</span><span class="period">.00 /mo</span></span>
                     </div>
-                    
                     <button onclick="configureServer(${server.id})" class="btn-configure">Configure Now!</button>
                 </div>
             `).join('');
@@ -263,81 +195,45 @@
 
         function getProcessorLogo(processor, variant) {
             if (processor === 'intel') {
-                return `
-                    <div class="intel-logo">
-                        <div class="intel-circle">intel</div>
-                        <div class="xeon-text">XEON</div>
-                        ${variant ? `<div class="variant-text">${variant}</div>` : ''}
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="amd-logo">
-                        <div class="amd-text">AMD</div>
-                        <div class="ryzen-text">RYZEN</div>
-                    </div>
-                `;
+                return `<div class="intel-logo"><div class="intel-circle">intel</div><div class="xeon-text">XEON</div>${variant ? `<div class="variant-text">${variant}</div>` : ''}</div>`;
             }
+            return `<div class="amd-logo"><div class="amd-text">AMD</div><div class="ryzen-text">RYZEN</div></div>`;
         }
 
         function updatePrice(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
-            const price = server.prices[plan];
-            document.getElementById(`price-${serverId}`).textContent = price.toLocaleString();
+            document.getElementById(`price-${serverId}`).textContent = server.prices[plan].toLocaleString();
         }
 
         function configureServer(serverId) {
             const plan = document.getElementById(`plan-${serverId}`).value;
             const server = servers.find(s => s.id === serverId);
-            const price = server.prices[plan];
-            
             sessionStorage.setItem('selected-server', JSON.stringify(server));
             sessionStorage.setItem('selected-plan', plan);
-            sessionStorage.setItem('selected-price', price);
-            
+            sessionStorage.setItem('selected-price', server.prices[plan]);
             window.location.href = 'payment.html';
         }
 
-        // Live Chat Functions
         function loadChatMessages() {
-            if (!currentUser) return;
-            if (chatUnsubscribe) chatUnsubscribe();
-
-            const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.innerHTML = '<div class="loading">Loading messages...</div>';
+            if (!currentUser || chatUnsubscribe) return;
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '<div class="loading">Loading messages...</div>';
 
             chatUnsubscribe = db.collection('chats').doc(currentUser.uid).collection('messages')
-                .orderBy('timestamp', 'asc')
-                .limit(50)
+                .orderBy('timestamp', 'asc').limit(50)
                 .onSnapshot((snapshot) => {
-                    messagesContainer.innerHTML = '';
-                    
+                    container.innerHTML = '';
                     if (snapshot.empty) {
-                        messagesContainer.innerHTML = `
-                            <div class="welcome-message">
-                                <p>Welcome to our support chat! How can we help you today?</p>
-                            </div>
-                        `;
+                        container.innerHTML = '<div class="welcome-message"><p>Welcome to our support chat! How can we help you today?</p></div>';
                         return;
                     }
-
                     snapshot.forEach((doc) => {
                         const msg = doc.data();
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = `chat-message ${msg.sender}`;
-                        
                         const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                        
-                        messageDiv.innerHTML = `
-                            <div class="message-bubble">${msg.text}</div>
-                            <div class="message-time">${time}</div>
-                        `;
-                        
-                        messagesContainer.appendChild(messageDiv);
+                        container.innerHTML += `<div class="chat-message ${msg.sender}"><div class="message-bubble">${msg.text}</div><div class="message-time">${time}</div></div>`;
                     });
-
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    container.scrollTop = container.scrollHeight;
                 });
         }
 
@@ -348,18 +244,12 @@
 
             try {
                 await db.collection('chats').doc(currentUser.uid).set({
-                    userEmail: currentUser.email,
-                    lastMessage: text,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active'
+                    userEmail: currentUser.email, lastMessage: text, lastUpdated: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
                 }, { merge: true });
 
                 await db.collection('chats').doc(currentUser.uid).collection('messages').add({
-                    sender: 'user',
-                    text: text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    sender: 'user', text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
                 input.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -368,42 +258,28 @@
         }
 
         function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
+            if (event.key === 'Enter') sendMessage();
         }
 
-        // Support Ticket Functions
         async function submitTicket(event) {
             event.preventDefault();
-            
-            const subject = document.getElementById('ticket-subject').value;
-            const priority = document.getElementById('ticket-priority').value;
-            const message = document.getElementById('ticket-message').value;
-            
             if (!currentUser) return;
             
             try {
                 const ticketNumber = 'TICKET-' + Math.floor(100000 + Math.random() * 900000);
-                
                 await db.collection('tickets').add({
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    ticketNumber: ticketNumber,
-                    subject: subject,
-                    priority: priority,
-                    message: message,
-                    status: 'open',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    userId: currentUser.uid, userEmail: currentUser.email, ticketNumber: ticketNumber,
+                    subject: document.getElementById('ticket-subject').value,
+                    priority: document.getElementById('ticket-priority').value,
+                    message: document.getElementById('ticket-message').value,
+                    status: 'open', createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
                 document.getElementById('ticket-number').textContent = ticketNumber;
                 document.getElementById('ticket-form').style.display = 'none';
                 document.getElementById('ticket-success').style.display = 'block';
-                
             } catch (error) {
                 console.error('Error submitting ticket:', error);
-                alert('Failed to submit ticket. Please try again.');
+                alert('Failed to submit ticket.');
             }
         }
 
@@ -413,62 +289,38 @@
             document.getElementById('ticket-success').style.display = 'none';
         }
 
-        // Load Orders
         async function loadOrders() {
             if (!currentUser) return;
-            
             try {
-                const snapshot = await db.collection('orders')
-                    .where('userId', '==', currentUser.uid)
-                    .orderBy('timestamp', 'desc')
-                    .get();
-                
+                const snapshot = await db.collection('orders').where('userId', '==', currentUser.uid).orderBy('timestamp', 'desc').get();
                 const ordersList = document.getElementById('orders-list');
                 
                 if (snapshot.empty) {
-                    ordersList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">📭</div>
-                            <h3>No Orders Yet</h3>
-                            <p>You haven't purchased any servers yet. Browse our available options to get started.</p>
-                            <button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button>
-                        </div>
-                    `;
+                    ordersList.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No Orders Yet</h3><p>You haven't purchased any servers yet.</p><button onclick="switchTab('servers')" class="btn-primary">Browse Servers</button></div>`;
                     return;
                 }
                 
                 ordersList.innerHTML = snapshot.docs.map(doc => {
                     const order = doc.data();
                     const date = order.timestamp ? order.timestamp.toDate().toLocaleDateString() : 'N/A';
-                    
-                    return `
-                        <div class="order-card">
-                            <div class="order-header">
-                                <h3>${order.serverName || 'Server Order'}</h3>
-                                <span class="order-status ${order.status}">${order.status || 'pending'}</span>
-                            </div>
-                            <div class="order-details">
-                                <p><strong>Plan:</strong> ${order.plan || 'N/A'}</p>
-                                <p><strong>Price:</strong> $${order.price ? order.price.toLocaleString() : '0'}</p>
-                                <p><strong>Network:</strong> ${order.network || 'N/A'}</p>
-                                <p><strong>Date:</strong> ${date}</p>
-                                ${order.transactionHash ? `<p><strong>TX Hash:</strong> <code>${order.transactionHash}</code></p>` : ''}
-                            </div>
+                    return `<div class="order-card">
+                        <div class="order-header"><h3>${order.serverName || 'Server Order'}</h3><span class="order-status ${order.status}">${order.status || 'pending'}</span></div>
+                        <div class="order-details">
+                            <p><strong>Plan:</strong> ${order.plan || 'N/A'}</p>
+                            <p><strong>Price:</strong> $${order.price ? order.price.toLocaleString() : '0'}</p>
+                            <p><strong>Date:</strong> ${date}</p>
+                            ${order.transactionHash ? `<p><strong>TX Hash:</strong> <code>${order.transactionHash}</code></p>` : ''}
                         </div>
-                    `;
+                    </div>`;
                 }).join('');
-                
             } catch (error) {
                 console.error('Error loading orders:', error);
             }
         }
 
         function logout() {
-            auth.signOut().then(() => {
-                window.location.href = 'login.html';
-            });
+            auth.signOut().then(() => { window.location.href = 'login.html'; });
         }
     </script>
 </body>
 </html>
-
