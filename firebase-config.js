@@ -1,4 +1,3 @@
-// کدی که از فایربیس گرفتی را اینجا جایگزین کن
 const firebaseConfig = {
   apiKey: "AIzaSyCZDyapSiYQQP7PDQpYC0zydYIIteNO6xg",
   authDomain: "my-first-app-54331.firebaseapp.com",
