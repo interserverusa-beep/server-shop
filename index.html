@@ -30,7 +30,7 @@
 
     <script src="firebase-config.js"></script>
     <script>
-        // اگر کاربر از قبل لاگین کرده باشد، مستقیم به داشبورد اصلی هدایت شود
+
         auth.onAuthStateChanged((user) => {
             if (user) {
                 window.location.href = 'dashboard.html';
