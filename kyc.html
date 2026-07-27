@@ -8,6 +8,33 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* Fix scrolling issue specifically for the KYC page */
+        body.login-page {
+            align-items: flex-start !important;
+            padding-top: 40px !important;
+            padding-bottom: 40px !important;
+            overflow-y: auto !important;
+            height: auto !important;
+        }
+        .login-container {
+            margin: 0 auto;
+        }
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .phone-input-group select {
+            width: 120px;
+            flex-shrink: 0;
+            margin: 8px 0 20px 0;
+        }
+        .phone-input-group input {
+            flex: 1;
+            margin: 8px 0 20px 0;
+        }
+    </style>
 </head>
 <body class="login-page">
     <div class="login-container" style="max-width: 700px; text-align: left;">
@@ -32,25 +59,38 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label>Country *</label>
+                <select id="country" required style="width: 100%;">
+                    <option value="" disabled selected>Select your country</option>
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+
             <div class="form-row">
-                <div class="form-group">
-                    <label>Country *</label>
-                    <input type="text" id="country" required>
-                </div>
                 <div class="form-group">
                     <label>Province / State *</label>
                     <input type="text" id="province" required>
+                </div>
+                <div class="form-group">
+                    <label>City *</label>
+                    <input type="text" id="city" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>City *</label>
-                    <input type="text" id="city" required>
-                </div>
-                <div class="form-group">
                     <label>Postal Code *</label>
                     <input type="text" id="postalCode" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <div class="phone-input-group">
+                        <select id="phoneCode" required>
+                            <option value="" disabled selected>Code</option>
+                        </select>
+                        <input type="tel" id="phoneNumber" placeholder="e.g., 9123456789" required>
+                    </div>
                 </div>
             </div>
 
@@ -64,15 +104,15 @@
                 <input type="text" id="idNumber" required>
             </div>
 
-            <!-- Fake Upload Section for UX -->
+            <!-- Optional Upload Section for UX -->
             <div class="form-group">
-                <label>Upload ID Document (For verification purposes)</label>
+                <label>Upload ID Document <span style="color: #7f8c8d; font-weight: 400;">(Optional)</span></label>
                 <input type="file" id="idFile" accept="image/*,.pdf" onchange="simulateUpload(this, 'id-msg')">
                 <small id="id-msg" style="color: #27ae60; font-weight: 600; display: none; margin-top: 5px;">✅ File securely uploaded and encrypted.</small>
             </div>
 
             <div class="form-group">
-                <label>Upload Selfie holding your ID</label>
+                <label>Upload Selfie holding your ID <span style="color: #7f8c8d; font-weight: 400;">(Optional)</span></label>
                 <input type="file" id="selfieFile" accept="image/*" onchange="simulateUpload(this, 'selfie-msg')">
                 <small id="selfie-msg" style="color: #27ae60; font-weight: 600; display: none; margin-top: 5px;">✅ File securely uploaded and encrypted.</small>
             </div>
@@ -86,6 +126,7 @@
             <div class="success-icon">✅</div>
             <h3>Information Submitted Successfully!</h3>
             <p>Our experts are reviewing your information. This process may take up to 48 hours.</p>
+            <p style="font-size: 14px; color: #5a6b7c; margin-top: 10px;">You can check the status in the <strong>Purchase History</strong> tab of your dashboard.</p>
             <button onclick="window.location.href='dashboard.html'" class="btn-primary" style="margin-top: 15px;">Back to Dashboard</button>
         </div>
 
@@ -98,10 +139,103 @@
             if (!user) window.location.href = 'login.html';
         });
 
+        // Comprehensive Country List (Excluding Iran 'IR' and North Korea 'KP')
+        const countries = [
+            { name: "United States", code: "US", dial: "+1" },
+            { name: "United Kingdom", code: "GB", dial: "+44" },
+            { name: "Canada", code: "CA", dial: "+1" },
+            { name: "Australia", code: "AU", dial: "+61" },
+            { name: "Germany", code: "DE", dial: "+49" },
+            { name: "France", code: "FR", dial: "+33" },
+            { name: "Italy", code: "IT", dial: "+39" },
+            { name: "Spain", code: "ES", dial: "+34" },
+            { name: "Netherlands", code: "NL", dial: "+31" },
+            { name: "Belgium", code: "BE", dial: "+32" },
+            { name: "Switzerland", code: "CH", dial: "+41" },
+            { name: "Austria", code: "AT", dial: "+43" },
+            { name: "Sweden", code: "SE", dial: "+46" },
+            { name: "Norway", code: "NO", dial: "+47" },
+            { name: "Denmark", code: "DK", dial: "+45" },
+            { name: "Finland", code: "FI", dial: "+358" },
+            { name: "Poland", code: "PL", dial: "+48" },
+            { name: "Russia", code: "RU", dial: "+7" },
+            { name: "Ukraine", code: "UA", dial: "+380" },
+            { name: "Turkey", code: "TR", dial: "+90" },
+            { name: "United Arab Emirates", code: "AE", dial: "+971" },
+            { name: "Saudi Arabia", code: "SA", dial: "+966" },
+            { name: "India", code: "IN", dial: "+91" },
+            { name: "China", code: "CN", dial: "+86" },
+            { name: "Japan", code: "JP", dial: "+81" },
+            { name: "South Korea", code: "KR", dial: "+82" },
+            { name: "Singapore", code: "SG", dial: "+65" },
+            { name: "Malaysia", code: "MY", dial: "+60" },
+            { name: "Indonesia", code: "ID", dial: "+62" },
+            { name: "Thailand", code: "TH", dial: "+66" },
+            { name: "Vietnam", code: "VN", dial: "+84" },
+            { name: "Philippines", code: "PH", dial: "+63" },
+            { name: "Brazil", code: "BR", dial: "+55" },
+            { name: "Mexico", code: "MX", dial: "+52" },
+            { name: "Argentina", code: "AR", dial: "+54" },
+            { name: "Chile", code: "CL", dial: "+56" },
+            { name: "Colombia", code: "CO", dial: "+57" },
+            { name: "South Africa", code: "ZA", dial: "+27" },
+            { name: "Egypt", code: "EG", dial: "+20" },
+            { name: "Nigeria", code: "NG", dial: "+234" },
+            { name: "New Zealand", code: "NZ", dial: "+64" },
+            { name: "Ireland", code: "IE", dial: "+353" },
+            { name: "Portugal", code: "PT", dial: "+351" },
+            { name: "Greece", code: "GR", dial: "+30" },
+            { name: "Czech Republic", code: "CZ", dial: "+420" },
+            { name: "Hungary", code: "HU", dial: "+36" },
+            { name: "Romania", code: "RO", dial: "+40" },
+            { name: "Israel", code: "IL", dial: "+972" },
+            { name: "Pakistan", code: "PK", dial: "+92" },
+            { name: "Bangladesh", code: "BD", dial: "+880" }
+        ].filter(c => c.code !== 'IR' && c.code !== 'KP'); // Explicitly exclude Iran and North Korea
+
+        // Helper function to generate flag emoji from country code
+        function getFlagEmoji(countryCode) {
+            const codePoints = countryCode
+                .toUpperCase()
+                .split('')
+                .map(char => 127397 + char.charCodeAt());
+            return String.fromCodePoint(...codePoints);
+        }
+
+        // Populate Country and Phone Code Dropdowns
+        const countrySelect = document.getElementById('country');
+        const phoneCodeSelect = document.getElementById('phoneCode');
+
+        countries.forEach(country => {
+            // Populate Country Select
+            const countryOption = document.createElement('option');
+            countryOption.value = country.name;
+            countryOption.textContent = `${getFlagEmoji(country.code)} ${country.name}`;
+            countryOption.dataset.dial = country.dial;
+            countryOption.dataset.code = country.code;
+            countrySelect.appendChild(countryOption);
+
+            // Populate Phone Code Select (Unique values only)
+            if (![...phoneCodeSelect.options].some(opt => opt.value === country.dial)) {
+                const phoneOption = document.createElement('option');
+                phoneOption.value = country.dial;
+                phoneOption.textContent = `${getFlagEmoji(country.code)} ${country.dial}`;
+                phoneCodeSelect.appendChild(phoneOption);
+            }
+        });
+
+        // Auto-update phone code when country changes
+        countrySelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.dataset.dial) {
+                phoneCodeSelect.value = selectedOption.dataset.dial;
+            }
+        });
+
         // Fake Upload Simulation
         function simulateUpload(input, msgId) {
+            const msgEl = document.getElementById(msgId);
             if (input.files.length > 0) {
-                const msgEl = document.getElementById(msgId);
                 msgEl.style.display = 'none';
                 msgEl.textContent = '⏳ Uploading and encrypting...';
                 msgEl.style.color = '#f39c12';
@@ -110,10 +244,13 @@
                 setTimeout(() => {
                     msgEl.textContent = '✅ File securely uploaded and encrypted.';
                     msgEl.style.color = '#27ae60';
-                }, 1500); // 1.5 second fake delay
+                }, 1500);
+            } else {
+                msgEl.style.display = 'none';
             }
         }
 
+        // Form Submission
         document.getElementById('kyc-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
@@ -124,23 +261,29 @@
             submitBtn.textContent = 'Submitting...';
 
             try {
-                // ONLY save TEXT data to Firestore. No files are actually uploaded.
+                const countryName = document.getElementById('country').value;
+                const countryCode = countrySelect.options[countrySelect.selectedIndex].dataset.code;
+
+                // Save TEXT data to Firestore
                 await db.collection('kyc_requests').doc(user.uid).set({
                     userId: user.uid,
                     email: user.email,
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
-                    country: document.getElementById('country').value,
+                    country: countryName,
+                    countryCode: countryCode,
                     province: document.getElementById('province').value,
                     city: document.getElementById('city').value,
                     postalCode: document.getElementById('postalCode').value,
                     address: document.getElementById('address').value,
+                    phoneCode: document.getElementById('phoneCode').value,
+                    phoneNumber: document.getElementById('phoneNumber').value,
                     idNumber: document.getElementById('idNumber').value,
-                    status: 'pending', 
+                    status: 'pending', // This triggers the "Under Review" UI in dashboard
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Update user's main profile status
+                // Update user's main profile status to pending
                 await db.collection('users').doc(user.uid).set({
                     kycStatus: 'pending'
                 }, { merge: true });
