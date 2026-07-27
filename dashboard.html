@@ -328,7 +328,7 @@
                     } else if (order.status === 'paid' || order.status === 'completed') {
                         
                         if (kycStatus === 'approved') {
-                            // ✅ حالت تایید شده
+                            
                             detailsHtml = `
                                 <div style="background: #e8f6f3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #a3e4d7;">
                                     <p style="color: #155724; font-weight: 600; font-size: 16px; margin-bottom: 15px;">✅ User identity verified</p>
@@ -338,7 +338,7 @@
                                 </div>
                             `;
                         } else if (kycStatus === 'rejected') {
-                            // ❌ حالت رد شده
+                            
                             detailsHtml = `
                                 <div style="background: #fdedec; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #f5b7b1;">
                                     <p style="color: #922b21; font-weight: 600; font-size: 16px;">❌ Identity verification rejected</p>
@@ -347,12 +347,12 @@
                                 </div>
                             `;
                         } else {
-                            // ⏳ حالت در دست بررسی (طبق درخواست دقیق شما)
+                        
                             detailsHtml = `
                                 <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffeeba;">
                                     <p style="color: #856404; font-weight: 600; font-size: 16px;">⏳ Under Review</p>
                                     <p style="font-size: 15px; color: #856404; margin: 10px 0; line-height: 1.6;">
-                                        احراز هویت شما در دست بررسی است و نتیجه ممکن است چندین روز طول بکشد.
+                                        Your identity verification is under review, and the result may take several days.
                                     </p>
                                 </div>
                             `;
