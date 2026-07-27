@@ -139,15 +139,11 @@
 
         // Tab Switching Function
         function switchTab(tabId, btnElement) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Show selected tab
             document.getElementById(tabId).classList.add('active');
             
-            // Update nav buttons
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -156,7 +152,6 @@
                 btnElement.classList.add('active');
             }
             
-            // Load chat if switching to live support
             if (tabId === 'live-support') {
                 loadChatMessages();
             }
@@ -292,30 +287,18 @@
                 .limit(50)
                 .onSnapshot((snapshot) => {
                     container.innerHTML = '';
-                    
                     if (snapshot.empty) {
-                        container.innerHTML = `
-                            <div class="welcome-message">
-                                <p>Welcome to our support chat! How can we help you today?</p>
-                            </div>
-                        `;
+                        container.innerHTML = `<div class="welcome-message"><p>Welcome to our support chat! How can we help you today?</p></div>`;
                         return;
                     }
-
                     snapshot.forEach((doc) => {
                         const msg = doc.data();
                         const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                        
                         const messageDiv = document.createElement('div');
                         messageDiv.className = `chat-message ${msg.sender}`;
-                        messageDiv.innerHTML = `
-                            <div class="message-bubble">${msg.text}</div>
-                            <div class="message-time">${time}</div>
-                        `;
-                        
+                        messageDiv.innerHTML = `<div class="message-bubble">${msg.text}</div><div class="message-time">${time}</div>`;
                         container.appendChild(messageDiv);
                     });
-
                     container.scrollTop = container.scrollHeight;
                 });
         }
@@ -327,18 +310,12 @@
 
             try {
                 await db.collection('chats').doc(currentUser.uid).set({
-                    userEmail: currentUser.email,
-                    lastMessage: text,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active'
+                    userEmail: currentUser.email, lastMessage: text, lastUpdated: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
                 }, { merge: true });
 
                 await db.collection('chats').doc(currentUser.uid).collection('messages').add({
-                    sender: 'user',
-                    text: text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    sender: 'user', text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
                 input.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -347,34 +324,25 @@
         }
 
         function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
+            if (event.key === 'Enter') sendMessage();
         }
 
         // Support Ticket Functions
         async function submitTicket(event) {
             event.preventDefault();
             if (!currentUser) return;
-            
             try {
                 const ticketNumber = 'TICKET-' + Math.floor(100000 + Math.random() * 900000);
-                
                 await db.collection('tickets').add({
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    ticketNumber: ticketNumber,
+                    userId: currentUser.uid, userEmail: currentUser.email, ticketNumber: ticketNumber,
                     subject: document.getElementById('ticket-subject').value,
                     priority: document.getElementById('ticket-priority').value,
                     message: document.getElementById('ticket-message').value,
-                    status: 'open',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    status: 'open', createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
                 document.getElementById('ticket-number').textContent = ticketNumber;
                 document.getElementById('ticket-form').style.display = 'none';
                 document.getElementById('ticket-success').style.display = 'block';
-                
             } catch (error) {
                 console.error('Error submitting ticket:', error);
                 alert('Failed to submit ticket. Please try again.');
@@ -387,11 +355,18 @@
             document.getElementById('ticket-success').style.display = 'none';
         }
 
-        // Load Orders
+        // ==========================================
+        // Load Orders & Check KYC Status (UPDATED)
+        // ==========================================
         async function loadOrders() {
             if (!currentUser) return;
             
             try {
+                // 1. Get User's KYC Status
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const kycStatus = userDoc.exists ? (userDoc.data().kycStatus || 'unverified') : 'unverified';
+
+                // 2. Get Orders
                 const snapshot = await db.collection('orders')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('timestamp', 'desc')
@@ -415,17 +390,64 @@
                     const order = doc.data();
                     const date = order.timestamp ? order.timestamp.toDate().toLocaleDateString() : 'N/A';
                     
+                    let detailsHtml = '';
+                    
+                    if (order.status === 'pending_verification') {
+                        detailsHtml = `<p style="color: #f39c12; font-weight: 600; margin-top: 10px;">⏳ Payment received. Awaiting admin verification.</p>`;
+                    } else if (order.status === 'paid' || order.status === 'completed') {
+                        
+                        if (kycStatus === 'approved') {
+                            // ✅ KYC APPROVED: Show Clear Details
+                            detailsHtml = `
+                                <div style="background: #e8f6f3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #a3e4d7;">
+                                    <p><strong>🖥️ Server IP:</strong> <code style="background:#fff; padding:2px 6px; border-radius:4px;">192.168.1.100</code></p>
+                                    <p><strong>🔑 Root Password:</strong> <code style="background:#fff; padding:2px 6px; border-radius:4px;">SuperSecretPass123!</code></p>
+                                    <p><strong>🌐 VPN Config:</strong> <code style="background:#fff; padding:2px 6px; border-radius:4px;">Available in control panel</code></p>
+                                    <p style="margin-top: 10px; font-size: 13px; color: #155724; font-weight: 600;">✅ Your identity has been verified. Server is active.</p>
+                                </div>
+                            `;
+                        } else if (kycStatus === 'rejected') {
+                            // ❌ KYC REJECTED
+                            detailsHtml = `
+                                <div style="background: #fdedec; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #f5b7b1;">
+                                    <p style="color: #922b21; font-weight: 600; font-size: 16px;">❌ Verification Failed</p>
+                                    <p style="font-size: 14px; color: #922b21; margin: 10px 0;">The provided information could not be verified. Please check your details and try again.</p>
+                                    <a href="kyc.html" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 14px; text-decoration: none; margin-top:10px;">Retry Verification</a>
+                                </div>
+                                <div style="margin-top: 15px; filter: blur(5px); user-select: none; opacity: 0.5; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <p><strong>🖥️ Server IP:</strong> <code>***.***.***.***</code></p>
+                                    <p><strong>🔑 Password:</strong> <code>************</code></p>
+                                </div>
+                            `;
+                        } else {
+                            // ⏳ UNVERIFIED or PENDING: Show Blurred Details + Warning
+                            detailsHtml = `
+                                <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffeeba;">
+                                    <p style="color: #856404; font-weight: 600; font-size: 16px;">🔒 Identity Verification Required</p>
+                                    <p style="font-size: 14px; color: #856404; margin: 10px 0;">To comply with regulations and activate your server, you must verify your identity. Server details are hidden until approved (up to 48 hours).</p>
+                                    <a href="kyc.html" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 14px; text-decoration: none; margin-top:10px;">Start Verification Process</a>
+                                </div>
+                                <div style="margin-top: 15px; filter: blur(6px); user-select: none; opacity: 0.6; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <p><strong>🖥️ Server IP:</strong> <code>***.***.***.***</code></p>
+                                    <p><strong>🔑 Password:</strong> <code>************</code></p>
+                                    <p><strong>🌐 VPN Config:</strong> <code>Hidden</code></p>
+                                </div>
+                            `;
+                        }
+                    }
+
                     return `
                         <div class="order-card">
                             <div class="order-header">
                                 <h3>${order.serverName || 'Server Order'}</h3>
-                                <span class="order-status ${order.status}">${order.status || 'pending'}</span>
+                                <span class="order-status ${order.status}">${order.status.replace('_', ' ')}</span>
                             </div>
                             <div class="order-details">
                                 <p><strong>Plan:</strong> ${order.plan || 'N/A'}</p>
                                 <p><strong>Price:</strong> $${order.price ? order.price.toLocaleString() : '0'}</p>
                                 <p><strong>Date:</strong> ${date}</p>
                                 ${order.transactionHash ? `<p><strong>TX Hash:</strong> <code>${order.transactionHash}</code></p>` : ''}
+                                ${detailsHtml}
                             </div>
                         </div>
                     `;
