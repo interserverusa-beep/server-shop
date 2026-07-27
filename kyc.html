@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     
     <style>
-        /* Fix scrolling issue specifically for the KYC page */
         body.login-page {
             align-items: flex-start !important;
             padding-top: 40px !important;
@@ -18,22 +17,10 @@
             overflow-y: auto !important;
             height: auto !important;
         }
-        .login-container {
-            margin: 0 auto;
-        }
-        .phone-input-group {
-            display: flex;
-            gap: 10px;
-        }
-        .phone-input-group select {
-            width: 120px;
-            flex-shrink: 0;
-            margin: 8px 0 20px 0;
-        }
-        .phone-input-group input {
-            flex: 1;
-            margin: 8px 0 20px 0;
-        }
+        .login-container { margin: 0 auto; }
+        .phone-input-group { display: flex; gap: 10px; }
+        .phone-input-group select { width: 120px; flex-shrink: 0; margin: 8px 0 20px 0; }
+        .phone-input-group input { flex: 1; margin: 8px 0 20px 0; }
     </style>
 </head>
 <body class="login-page">
@@ -63,7 +50,6 @@
                 <label>Country *</label>
                 <select id="country" required style="width: 100%;">
                     <option value="" disabled selected>Select your country</option>
-                    <!-- Options will be populated by JavaScript -->
                 </select>
             </div>
 
@@ -104,16 +90,16 @@
                 <input type="text" id="idNumber" required>
             </div>
 
-            <!-- Optional Upload Section for UX -->
+            <!-- Mandatory Upload Section -->
             <div class="form-group">
-                <label>Upload ID Document <span style="color: #7f8c8d; font-weight: 400;">(Optional)</span></label>
-                <input type="file" id="idFile" accept="image/*,.pdf" onchange="simulateUpload(this, 'id-msg')">
+                <label>Upload ID Document *</label>
+                <input type="file" id="idFile" accept="image/*,.pdf" required onchange="simulateUpload(this, 'id-msg')">
                 <small id="id-msg" style="color: #27ae60; font-weight: 600; display: none; margin-top: 5px;">✅ File securely uploaded and encrypted.</small>
             </div>
 
             <div class="form-group">
-                <label>Upload Selfie holding your ID <span style="color: #7f8c8d; font-weight: 400;">(Optional)</span></label>
-                <input type="file" id="selfieFile" accept="image/*" onchange="simulateUpload(this, 'selfie-msg')">
+                <label>Upload Selfie holding your ID *</label>
+                <input type="file" id="selfieFile" accept="image/*" required onchange="simulateUpload(this, 'selfie-msg')">
                 <small id="selfie-msg" style="color: #27ae60; font-weight: 600; display: none; margin-top: 5px;">✅ File securely uploaded and encrypted.</small>
             </div>
 
@@ -126,7 +112,6 @@
             <div class="success-icon">✅</div>
             <h3>Information Submitted Successfully!</h3>
             <p>Our experts are reviewing your information. This process may take up to 48 hours.</p>
-            <p style="font-size: 14px; color: #5a6b7c; margin-top: 10px;">You can check the status in the <strong>Purchase History</strong> tab of your dashboard.</p>
             <button onclick="window.location.href='dashboard.html'" class="btn-primary" style="margin-top: 15px;">Back to Dashboard</button>
         </div>
 
@@ -139,7 +124,6 @@
             if (!user) window.location.href = 'login.html';
         });
 
-        // Comprehensive Country List (Excluding Iran 'IR' and North Korea 'KP')
         const countries = [
             { name: "United States", code: "US", dial: "+1" },
             { name: "United Kingdom", code: "GB", dial: "+44" },
@@ -191,31 +175,23 @@
             { name: "Israel", code: "IL", dial: "+972" },
             { name: "Pakistan", code: "PK", dial: "+92" },
             { name: "Bangladesh", code: "BD", dial: "+880" }
-        ].filter(c => c.code !== 'IR' && c.code !== 'KP'); // Explicitly exclude Iran and North Korea
+        ].filter(c => c.code !== 'IR' && c.code !== 'KP');
 
-        // Helper function to generate flag emoji from country code
         function getFlagEmoji(countryCode) {
-            const codePoints = countryCode
-                .toUpperCase()
-                .split('')
-                .map(char => 127397 + char.charCodeAt());
+            const codePoints = countryCode.toUpperCase().split('').map(char => 127397 + char.charCodeAt());
             return String.fromCodePoint(...codePoints);
         }
 
-        // Populate Country and Phone Code Dropdowns
         const countrySelect = document.getElementById('country');
         const phoneCodeSelect = document.getElementById('phoneCode');
 
         countries.forEach(country => {
-            // Populate Country Select
             const countryOption = document.createElement('option');
             countryOption.value = country.name;
             countryOption.textContent = `${getFlagEmoji(country.code)} ${country.name}`;
             countryOption.dataset.dial = country.dial;
-            countryOption.dataset.code = country.code;
             countrySelect.appendChild(countryOption);
 
-            // Populate Phone Code Select (Unique values only)
             if (![...phoneCodeSelect.options].some(opt => opt.value === country.dial)) {
                 const phoneOption = document.createElement('option');
                 phoneOption.value = country.dial;
@@ -224,15 +200,11 @@
             }
         });
 
-        // Auto-update phone code when country changes
         countrySelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.dataset.dial) {
-                phoneCodeSelect.value = selectedOption.dataset.dial;
-            }
+            if (selectedOption.dataset.dial) phoneCodeSelect.value = selectedOption.dataset.dial;
         });
 
-        // Fake Upload Simulation
         function simulateUpload(input, msgId) {
             const msgEl = document.getElementById(msgId);
             if (input.files.length > 0) {
@@ -240,7 +212,6 @@
                 msgEl.textContent = '⏳ Uploading and encrypting...';
                 msgEl.style.color = '#f39c12';
                 msgEl.style.display = 'block';
-                
                 setTimeout(() => {
                     msgEl.textContent = '✅ File securely uploaded and encrypted.';
                     msgEl.style.color = '#27ae60';
@@ -250,7 +221,6 @@
             }
         }
 
-        // Form Submission
         document.getElementById('kyc-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
@@ -264,7 +234,6 @@
                 const countryName = document.getElementById('country').value;
                 const countryCode = countrySelect.options[countrySelect.selectedIndex].dataset.code;
 
-                // Save TEXT data to Firestore
                 await db.collection('kyc_requests').doc(user.uid).set({
                     userId: user.uid,
                     email: user.email,
@@ -279,11 +248,10 @@
                     phoneCode: document.getElementById('phoneCode').value,
                     phoneNumber: document.getElementById('phoneNumber').value,
                     idNumber: document.getElementById('idNumber').value,
-                    status: 'pending', // This triggers the "Under Review" UI in dashboard
+                    status: 'pending',
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Update user's main profile status to pending
                 await db.collection('users').doc(user.uid).set({
                     kycStatus: 'pending'
                 }, { merge: true });
