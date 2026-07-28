@@ -290,7 +290,7 @@
         }
 
         // ==========================================
-        // Load Orders & Check KYC Status (UPDATED WITH EXACT MESSAGES)
+        // Load Orders & Check KYC Status (PROFESSIONAL TEMPLATE)
         // ==========================================
         async function loadOrders() {
             if (!currentUser) return;
@@ -298,7 +298,7 @@
             try {
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
                 const kycStatus = userDoc.exists ? (userDoc.data().kycStatus || 'unverified') : 'unverified';
-
+        
                 const snapshot = await db.collection('orders')
                     .where('userId', '==', currentUser.uid)
                     .get();
@@ -328,17 +328,60 @@
                     } else if (order.status === 'paid' || order.status === 'completed') {
                         
                         if (kycStatus === 'approved') {
-                            
+                            // ✅ قالب حرفه‌ای و کامل نمایش مشخصات سرور
                             detailsHtml = `
-                                <div style="background: #e8f6f3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #a3e4d7;">
-                                    <p style="color: #155724; font-weight: 600; font-size: 16px; margin-bottom: 15px;">✅ User identity verified</p>
-                                    <p><strong>🖥️ Server IP:</strong> <code style="background:#fff; padding:2px 6px; border-radius:4px;">${order.serverIp || 'Will be provided soon'}</code></p>
-                                    <p><strong>🔑 Root Password:</strong> <code style="background:#fff; padding:2px 6px; border-radius:4px;">${order.serverPassword || 'Will be provided soon'}</code></p>
-                                    <p style="margin-top: 10px; font-size: 13px; color: #155724; font-weight: 600;">Server is active and ready to use.</p>
+                                <div style="background: #f8fafc; border: 1px solid #a3e4d7; border-radius: 8px; margin-top: 15px; overflow: hidden; text-align: left; font-family: 'Segoe UI', Tahoma, sans-serif;">
+                                    <div style="background: #e8f6f3; padding: 15px 20px; border-bottom: 1px solid #a3e4d7;">
+                                        <p style="color: #155724; font-weight: 700; font-size: 16px; margin: 0;">✅ User Identity Verified & Server Provisioned</p>
+                                        <p style="color: #0e6655; font-size: 13px; margin: 5px 0 0 0;">Order #${order.orderId || 'N/A'}</p>
+                                    </div>
+                                    <div style="padding: 20px; font-size: 14px; line-height: 1.6; color: #2c3e50;">
+                                        <p>Dear Customer,</p>
+                                        <p>Your dedicated server has been successfully provisioned and is now ready for use.</p>
+        
+                                        <h4 style="color: #1a3a5c; border-bottom: 2px solid #e0eafc; padding-bottom: 5px; margin-top: 20px;">📌 SERVER SPECIFICATIONS</h4>
+                                        <p><strong>CPU:</strong> ${order.serverCpu || 'N/A'}<br>
+                                        <strong>RAM:</strong> ${order.serverRam || 'N/A'}<br>
+                                        <strong>Storage:</strong> ${order.serverStorage || 'N/A'}<br>
+                                        <strong>Bandwidth:</strong> ${order.serverBandwidth || 'N/A'}<br>
+                                        <strong>OS:</strong> ${order.serverOs || 'N/A'}<br>
+                                        <strong>VPN Service:</strong> ${order.serverVpn || 'N/A'}</p>
+        
+                                        <h4 style="color: #1a3a5c; border-bottom: 2px solid #e0eafc; padding-bottom: 5px; margin-top: 20px;">🔑 SSH ACCESS (Root Login)</h4>
+                                        <p><strong>IP Address:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.sshIp || 'N/A'}</code><br>
+                                        <strong>Port:</strong> ${order.sshPort || '22'}<br>
+                                        <strong>Username:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.sshUser || 'root'}</code><br>
+                                        <strong>Password:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.sshPass || 'N/A'}</code></p>
+        
+                                        <h4 style="color: #1a3a5c; border-bottom: 2px solid #e0eafc; padding-bottom: 5px; margin-top: 20px;">🔐 VPN ACCESS (OpenVPN)</h4>
+                                        <p><strong>Config File URL:</strong> <a href="${order.vpnUrl || '#'}" target="_blank" style="color: #0070cc; word-break: break-all;">${order.vpnUrl || 'N/A'}</a><br>
+                                        <strong>Username:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.vpnUser || 'N/A'}</code><br>
+                                        <strong>Password:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.vpnPass || 'N/A'}</code><br>
+                                        <strong>Protocol/Port:</strong> ${order.vpnProtocol || 'UDP'} / ${order.vpnPort || '1194'}</p>
+        
+                                        <h4 style="color: #1a3a5c; border-bottom: 2px solid #e0eafc; padding-bottom: 5px; margin-top: 20px;">🖥️ CONTROL PANEL</h4>
+                                        <p><strong>Panel URL:</strong> <a href="${order.panelUrl || '#'}" target="_blank" style="color: #0070cc; word-break: break-all;">${order.panelUrl || 'N/A'}</a><br>
+                                        <strong>Username:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.panelUser || 'N/A'}</code><br>
+                                        <strong>Password:</strong> <code style="background:#fff; padding:3px 8px; border:1px solid #ddd; border-radius:4px; font-family: monospace;">${order.panelPass || 'N/A'}</code></p>
+        
+                                        <h4 style="color: #1a3a5c; border-bottom: 2px solid #e0eafc; padding-bottom: 5px; margin-top: 20px;">📋 QUICK CONNECTION COMMANDS</h4>
+                                        <div style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 13px; margin-top: 10px;">
+                                            <p style="margin: 0 0 10px 0;">1️⃣ Connect via SSH:<br><span style="color: #2ecc71;">> ssh ${order.sshUser || 'root'}@${order.sshIp || 'IP'}</span></p>
+                                            <p style="margin: 0;">2️⃣ Connect via OpenVPN:<br><span style="color: #2ecc71;">> openvpn --config client.ovpn</span></p>
+                                        </div>
+        
+                                        <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 13px; color: #856404;">
+                                            <strong>⚠️ IMPORTANT SECURITY NOTICE:</strong><br>
+                                            • These are temporary credentials. Please change the root password immediately using the 'passwd' command.<br>
+                                            • For better security, generate an SSH key pair and disable password authentication.<br>
+                                            • Do not share these details. Our support team will never ask for your password.
+                                        </div>
+                                        
+                                        <p style="margin-top: 20px; font-size: 13px; color: #7f8c8d;">Best Regards,<br>Server Provisioning Team</p>
+                                    </div>
                                 </div>
                             `;
                         } else if (kycStatus === 'rejected') {
-                            
                             detailsHtml = `
                                 <div style="background: #fdedec; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #f5b7b1;">
                                     <p style="color: #922b21; font-weight: 600; font-size: 16px;">❌ Identity verification rejected</p>
@@ -347,7 +390,6 @@
                                 </div>
                             `;
                         } else {
-                        
                             detailsHtml = `
                                 <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffeeba;">
                                     <p style="color: #856404; font-weight: 600; font-size: 16px;">⏳ Under Review</p>
@@ -358,7 +400,7 @@
                             `;
                         }
                     }
-
+        
                     return `
                         <div class="order-card">
                             <div class="order-header">
