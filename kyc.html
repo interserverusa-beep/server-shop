@@ -231,8 +231,10 @@
             submitBtn.textContent = 'Submitting...';
 
             try {
-                const countryName = document.getElementById('country').value;
-                const countryCode = countrySelect.options[countrySelect.selectedIndex].dataset.code;
+                const countrySelect = document.getElementById('country');
+                const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+                const countryName = selectedOption.value;
+                const countryCode = selectedOption.dataset.code || 'UNKNOWN'; 
 
                 await db.collection('kyc_requests').doc(user.uid).set({
                     userId: user.uid,
