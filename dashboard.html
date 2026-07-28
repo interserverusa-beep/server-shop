@@ -290,7 +290,7 @@
         }
 
         // ==========================================
-        // Load Orders & Check KYC Status (PROFESSIONAL TEMPLATE)
+        // Load Orders & Check KYC Status (FIXED LOGIC)
         // ==========================================
         async function loadOrders() {
             if (!currentUser) return;
@@ -328,7 +328,7 @@
                     } else if (order.status === 'paid' || order.status === 'completed') {
                         
                         if (kycStatus === 'approved') {
-                            // ✅ قالب حرفه‌ای و کامل نمایش مشخصات سرور
+                            // ✅ حالت تایید شده: نمایش کامل مشخصات سرور
                             detailsHtml = `
                                 <div style="background: #f8fafc; border: 1px solid #a3e4d7; border-radius: 8px; margin-top: 15px; overflow: hidden; text-align: left; font-family: 'Segoe UI', Tahoma, sans-serif;">
                                     <div style="background: #e8f6f3; padding: 15px 20px; border-bottom: 1px solid #a3e4d7;">
@@ -382,6 +382,7 @@
                                 </div>
                             `;
                         } else if (kycStatus === 'rejected') {
+                            // ❌ حالت رد شده
                             detailsHtml = `
                                 <div style="background: #fdedec; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #f5b7b1;">
                                     <p style="color: #922b21; font-weight: 600; font-size: 16px;">❌ Identity verification rejected</p>
@@ -389,13 +390,23 @@
                                     <a href="kyc.html" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 14px; text-decoration: none; margin-top:10px;">Retry Verification</a>
                                 </div>
                             `;
-                        } else {
+                        } else if (kycStatus === 'pending') {
+                            // ⏳ حالت در دست بررسی (فقط اگر کاربر فرم را پر کرده باشد)
                             detailsHtml = `
                                 <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffeeba;">
                                     <p style="color: #856404; font-weight: 600; font-size: 16px;">⏳ Under Review</p>
                                     <p style="font-size: 15px; color: #856404; margin: 10px 0; line-height: 1.6;">
                                         Your identity verification is under review, and the result may take several days.
                                     </p>
+                                </div>
+                            `;
+                        } else {
+                            // 🔒 حالت پر نشده (کاربر هنوز فرم احراز هویت را ارسال نکرده است)
+                            detailsHtml = `
+                                <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffeeba;">
+                                    <p style="color: #856404; font-weight: 600; font-size: 16px;">🔒 Identity Verification Required</p>
+                                    <p style="font-size: 14px; color: #856404; margin: 10px 0;">To activate your server, you must verify your identity. Server details are hidden until approved.</p>
+                                    <a href="kyc.html" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 14px; text-decoration: none; margin-top:10px;">Start Verification Process</a>
                                 </div>
                             `;
                         }
