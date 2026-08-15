@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Support Tickets</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="admin-container" style="max-width: 1200px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px;">
+        <h2 style="color: #1a3a5c; margin-bottom: 30px;">🎫 Support Tickets Management</h2>
+        <div id="tickets-list"></div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        // Check if user is admin (your email)
+        auth.onAuthStateChanged((user) => {
+            if (!user || user.email !== 'interserverusa@gmail.com') {
+                alert('Access Denied! Admin only.');
+                window.location.href = 'index.html';
+            } else {
+                loadTickets();
+            }
+        });
+
+        async function loadTickets() {
+            const snapshot = await db.collection('tickets').orderBy('createdAt', 'desc').get();
+            const container = document.getElementById('tickets-list');
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<p>No tickets found.</p>';
+                return;
+            }
+
+            container.innerHTML = snapshot.docs.map(doc => {
+                const ticket = doc.data();
+                const createdAt = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString() : 'N/A';
+                
+                return `
+                    <div style="border: 2px solid #e0eafc; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="margin: 0; color: #1a3a5c;">${ticket.subject}</h3>
+                            <span style="padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; background: ${ticket.status === 'open' ? '#fff3cd' : '#d4edda'}; color: ${ticket.status === 'open' ? '#856404' : '#155724'};">
+                                ${ticket.status.toUpperCase()}
+                            </span>
+                        </div>
+                        <p><strong>Ticket #:</strong> ${ticket.ticketNumber}</p>
+                        <p><strong>User:</strong> ${ticket.userEmail}</p>
+                        <p><strong>Priority:</strong> <span style="color: ${ticket.priority === 'high' || ticket.priority === 'urgent' ? '#e74c3c' : '#2c3e50'}; font-weight: 600;">${ticket.priority.toUpperCase()}</span></p>
+                        <p><strong>Created:</strong> ${createdAt}</p>
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                            <strong>Message:</strong><br>
+                            ${ticket.message}
+                        </div>
+                        
+                        ${ticket.adminReply ? `
+                            <div style="background: #e8f6f3; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #27ae60;">
+                                <strong>Your Reply:</strong><br>
+                                ${ticket.adminReply}
+                            </div>
+                        ` : ''}
+                        
+                        <div style="margin-top: 20px;">
+                            <textarea id="reply-${doc.id}" rows="4" placeholder="Type your reply here..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; margin-bottom: 10px;"></textarea>
+                            <button onclick="replyToTicket('${doc.id}', '${ticket.userEmail}', '${ticket.subject}')" class="btn-primary" style="margin-right: 10px;">📤 Send Reply</button>
+                            <button onclick="markAsResolved('${doc.id}')" class="btn-secondary">✅ Mark as Resolved</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function replyToTicket(ticketId, userEmail, subject) {
+            const replyText = document.getElementById(`reply-${ticketId}`).value.trim();
+            
+            if (!replyText) {
+                alert('Please enter a reply message.');
+                return;
+            }
+
+            try {
+                await db.collection('tickets').doc(ticketId).update({
+                    adminReply: replyText,
+                    repliedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'replied'
+                });
+
+                // Optional: Send email notification using EmailJS
+                // await emailjs.send('your_service_id', 'your_template_id', {
+                //     to_email: userEmail,
+                //     subject: `Re: ${subject}`,
+                //     message: replyText
+                // });
+
+                alert('Reply sent successfully!');
+                loadTickets(); // Reload to show the reply
+            } catch (error) {
+                console.error('Error sending reply:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function markAsResolved(ticketId) {
+            if (confirm('Mark this ticket as resolved?')) {
+                await db.collection('tickets').doc(ticketId).update({
+                    status: 'resolved',
+                    resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert('Ticket marked as resolved.');
+                loadTickets();
+            }
+        }
+    </script>
+</body>
+</html>
