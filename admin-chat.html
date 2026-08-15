@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Live Chat Support</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <style>
+        .admin-chat-container { max-width: 1000px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; }
+        .chat-user-item { border: 2px solid #e0eafc; border-radius: 8px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
+        .chat-user-item:hover { border-color: #0070cc; background: #f0f8ff; }
+        .chat-user-item.active { border-color: #0070cc; background: #e6f4ff; }
+        .admin-chat-box { background: #f8fafc; border: 2px solid #e0eafc; border-radius: 8px; padding: 20px; margin-top: 20px; max-height: 600px; overflow-y: auto; }
+        .admin-message { background: #e8f6f3; padding: 12px 18px; border-radius: 12px; margin: 10px 0; max-width: 70%; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .user-message { background: #ffffff; padding: 12px 18px; border-radius: 12px; margin: 10px 0; max-width: 70%; align-self: flex-start; border: 1px solid #d1d9e6; border-bottom-left-radius: 4px; }
+        .message-meta { font-size: 11px; color: #7f8c8d; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="admin-chat-container">
+        <h2 style="color: #1a3a5c; margin-bottom: 30px;">💬 Live Chat Support - Admin Panel</h2>
+        
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">Active Users:</h3>
+            <div id="users-list"></div>
+        </div>
+
+        <div id="chat-interface" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #e0eafc;">
+                <h3 id="current-user-email" style="margin: 0; color: #1a3a5c;"></h3>
+                <button onclick="closeChat()" class="btn-secondary">Close Chat</button>
+            </div>
+            
+            <div class="admin-chat-box" id="admin-chat-messages"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <input type="text" id="admin-message-input" placeholder="Type your reply..." style="flex: 1; padding: 12px; border: 2px solid #cbd5e0; border-radius: 6px;">
+                <button onclick="sendAdminMessage()" class="btn-primary">📤 Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        let currentUserId = null;
+        let chatUnsubscribe = null;
+
+        // Check if user is admin
+        auth.onAuthStateChanged((user) => {
+            if (!user || user.email !== 'interserverusa@gmail.com') {
+                alert('Access Denied! Admin only.');
+                window.location.href = 'index.html';
+            } else {
+                loadActiveUsers();
+            }
+        });
+
+        // Load all users who have chats
+        async function loadActiveUsers() {
+            const snapshot = await db.collection('chats').get();
+            const container = document.getElementById('users-list');
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<p style="color: #7f8c8d;">No active chats.</p>';
+                return;
+            }
+
+            container.innerHTML = snapshot.docs.map(doc => {
+                const chatData = doc.data();
+                const lastMsg = chatData.lastMessage || 'No messages';
+                const lastUpdated = chatData.lastUpdated ? chatData.lastUpdated.toDate().toLocaleString() : 'N/A';
+                
+                return `
+                    <div class="chat-user-item" onclick="openUserChat('${doc.id}', '${chatData.userEmail || 'Unknown'}')">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #1a3a5c;">${chatData.userEmail || 'Unknown User'}</strong>
+                                <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 13px;">${lastMsg.substring(0, 60)}${lastMsg.length > 60 ? '...' : ''}</p>
+                                <small style="color: #95a5a6; font-size: 11px;">Last active: ${lastUpdated}</small>
+                            </div>
+                            <span style="padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background: ${chatData.status === 'active' ? '#d4edda' : '#fff3cd'}; color: ${chatData.status === 'active' ? '#155724' : '#856404'};">
+                                ${chatData.status || 'inactive'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Open chat with specific user
+        function openUserChat(userId, userEmail) {
+            currentUserId = userId;
+            document.getElementById('current-user-email').textContent = userEmail;
+            document.getElementById('chat-interface').style.display = 'block';
+            
+            // Highlight active user
+            document.querySelectorAll('.chat-user-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.chat-user-item').classList.add('active');
+            
+            loadUserMessages(userId);
+        }
+
+        // Load messages for specific user
+        function loadUserMessages(userId) {
+            if (chatUnsubscribe) chatUnsubscribe();
+
+            const container = document.getElementById('admin-chat-messages');
+            container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Loading messages...</p>';
+
+            chatUnsubscribe = db.collection('chats').doc(userId).collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((snapshot) => {
+                    container.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No messages yet.</p>';
+                        return;
+                    }
+
+                    snapshot.forEach((doc) => {
+                        const msg = doc.data();
+                        const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString() : '';
+                        
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = msg.sender === 'admin' ? 'admin-message' : 'user-message';
+                        messageDiv.innerHTML = `
+                            <div>${msg.text}</div>
+                            <div class="message-meta">${msg.sender === 'admin' ? 'You' : 'User'} • ${time}</div>
+                        `;
+                        
+                        container.appendChild(messageDiv);
+                    });
+
+                    container.scrollTop = container.scrollHeight;
+                });
+        }
+
+        // Send admin message
+        async function sendAdminMessage() {
+            const input = document.getElementById('admin-message-input');
+            const text = input.value.trim();
+            
+            if (!text || !currentUserId) {
+                alert('Please enter a message.');
+                return;
+            }
+
+            try {
+                // Add message to user's chat
+                await db.collection('chats').doc(currentUserId).collection('messages').add({
+                    sender: 'admin',
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update parent chat document
+                await db.collection('chats').doc(currentUserId).update({
+                    lastMessage: text,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                });
+
+                input.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function closeChat() {
+            currentUserId = null;
+            document.getElementById('chat-interface').style.display = 'none';
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+                chatUnsubscribe = null;
+            }
+            loadActiveUsers(); // Refresh users list
+        }
+
+        // Handle Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && currentUserId) {
+                sendAdminMessage();
+            }
+        });
+    </script>
+</body>
+</html>
