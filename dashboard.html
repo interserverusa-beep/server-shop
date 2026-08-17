@@ -120,6 +120,12 @@
                     <button onclick="resetTicketForm()" class="btn-primary">Create Another Ticket</button>
                 </div>
             </div>
+            
+            <!-- Ticket History Section (NEW) -->
+            <div style="margin-top: 40px;">
+                <h2 style="color: #1a3a5c; margin-bottom: 20px; font-size: 24px;">📋 Ticket History</h2>
+                <div id="ticket-history-list"></div>
+            </div>
         </div>
     </main>
 
@@ -136,6 +142,7 @@
                 document.getElementById('user-email-display').textContent = user.email;
                 loadServers();
                 loadOrders();
+                checkUnreadMessages(); // Check for unread chat messages
             }
         });
 
@@ -146,7 +153,12 @@
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
             
-            if (tabId === 'live-support') loadChatMessages();
+            if (tabId === 'live-support') {
+                loadChatMessages();
+                clearUnreadMessages(); // Clear badge when opening chat
+            } else if (tabId === 'support-ticket') {
+                loadTicketHistory(); // Load ticket history when opening tab
+            }
         }
 
         const servers = [
@@ -280,6 +292,7 @@
                 document.getElementById('ticket-number').textContent = ticketNumber;
                 document.getElementById('ticket-form').style.display = 'none';
                 document.getElementById('ticket-success').style.display = 'block';
+                loadTicketHistory(); // Refresh ticket history
             } catch (error) {
                 console.error('Error submitting ticket:', error);
                 alert('Failed to submit ticket. Please try again.');
@@ -290,6 +303,102 @@
             document.getElementById('ticket-form').reset();
             document.getElementById('ticket-form').style.display = 'block';
             document.getElementById('ticket-success').style.display = 'none';
+        }
+
+        // ==========================================
+        // NEW: Load Ticket History
+        // ==========================================
+        async function loadTicketHistory() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('tickets')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                const container = document.getElementById('ticket-history-list');
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color: #7f8c8d; text-align: center; padding: 40px;">No ticket history found.</p>';
+                    return;
+                }
+                
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const ticket = doc.data();
+                    const createdAt = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString() : 'N/A';
+                    const repliedAt = ticket.repliedAt ? ticket.repliedAt.toDate().toLocaleString() : null;
+                    
+                    return `
+                        <div style="border: 2px solid #e0eafc; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: white;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #f0f8ff;">
+                                <h3 style="margin: 0; color: #1a3a5c; font-size: 18px;">${ticket.subject}</h3>
+                                <span style="padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; background: ${ticket.status === 'open' ? '#fff3cd' : ticket.status === 'replied' ? '#d1ecf1' : '#d4edda'}; color: ${ticket.status === 'open' ? '#856404' : ticket.status === 'replied' ? '#0c5460' : '#155724'};">
+                                    ${ticket.status.toUpperCase()}
+                                </span>
+                            </div>
+                            <p style="margin: 5px 0;"><strong>Ticket #:</strong> ${ticket.ticketNumber}</p>
+                            <p style="margin: 5px 0;"><strong>Priority:</strong> <span style="color: ${ticket.priority === 'high' || ticket.priority === 'urgent' ? '#e74c3c' : '#2c3e50'}; font-weight: 600;">${ticket.priority.toUpperCase()}</span></p>
+                            <p style="margin: 5px 0;"><strong>Created:</strong> ${createdAt}</p>
+                            
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                                <strong style="color: #1a3a5c;">Your Message:</strong>
+                                <p style="margin: 10px 0 0 0; color: #2c3e50; line-height: 1.6;">${ticket.message}</p>
+                            </div>
+                            
+                            ${ticket.adminReply ? `
+                                <div style="background: #e8f6f3; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #27ae60;">
+                                    <strong style="color: #0e6655;">Support Team Reply:</strong>
+                                    <p style="margin: 10px 0 0 0; color: #0e6655; line-height: 1.6;">${ticket.adminReply}</p>
+                                    ${repliedAt ? `<p style="margin: 10px 0 0 0; font-size: 12px; color: #7f8c8d;">Replied at: ${repliedAt}</p>` : ''}
+                                </div>
+                            ` : ticket.status === 'replied' ? `
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                                    <p style="margin: 0; color: #856404;">⏳ Admin has replied. Please check your email for the response.</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading ticket history:', error);
+            }
+        }
+
+        // ==========================================
+        // NEW: Check for unread chat messages
+        // ==========================================
+        function checkUnreadMessages() {
+            if (!currentUser) return;
+            
+            db.collection('chats').doc(currentUser.uid).onSnapshot((doc) => {
+                if (doc.exists) {
+                    const chatData = doc.data();
+                    const unreadCount = chatData.unreadCount || 0;
+                    const badge = document.getElementById('chat-badge');
+                    
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Clear unread messages count
+        async function clearUnreadMessages() {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('chats').doc(currentUser.uid).update({
+                    unreadCount: 0
+                });
+            } catch (error) {
+                console.error('Error clearing unread messages:', error);
+            }
         }
 
         // ==========================================
@@ -407,7 +516,7 @@
                             // 🔒 حالت پر نشده (کاربر هنوز فرم احراز هویت را ارسال نکرده است)
                             detailsHtml = `
                                 <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffeeba;">
-                                    <p style="color: #856404; font-weight: 600; font-size: 16px;">🔒 Identity Verification Required</p>
+                                    <p style="color: #856404; font-weight: 600; font-size: 16px;"> Identity Verification Required</p>
                                     <p style="font-size: 14px; color: #856404; margin: 10px 0;">To activate your server, you must verify your identity. Server details are hidden until approved.</p>
                                     <a href="kyc.html" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 14px; text-decoration: none; margin-top:10px;">Start Verification Process</a>
                                 </div>
