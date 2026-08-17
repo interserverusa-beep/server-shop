@@ -23,7 +23,10 @@
             <!-- Responsive Tabs Navigation -->
             <nav class="main-nav">
                 <button class="nav-btn active" onclick="switchTab('servers', this)">Servers</button>
-                <button class="nav-btn" onclick="switchTab('live-support', this)">Live Support</button>
+                <button class="nav-btn" onclick="switchTab('live-support', this)" style="position: relative;">
+                    Live Support
+                    <span id="chat-badge" class="badge" style="display: none; position: absolute; top: -8px; right: -8px; background: #e74c3c; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: bold; text-align: center; line-height: 20px;">0</span>
+                </button>
                 <button class="nav-btn" onclick="switchTab('purchase-history', this)">Purchase History</button>
                 <button class="nav-btn" onclick="switchTab('support-ticket', this)">Support Ticket</button>
             </nav>
