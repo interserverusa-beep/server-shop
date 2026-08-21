@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Server Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <style>
+        .admin-container { max-width: 1400px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #e8f4fc; }
+        .admin-nav { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .admin-tab-btn { padding: 12px 24px; background: #f0f8ff; border: 2px solid #d1e7ff; border-radius: 8px; cursor: pointer; font-weight: 600; color: #1a3a5c; transition: all 0.3s; }
+        .admin-tab-btn:hover { background: #d1e7ff; }
+        .admin-tab-btn.active { background: #0070cc; color: white; border-color: #0070cc; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, #f0f8ff 0%, #e6f4ff 100%); padding: 25px; border-radius: 10px; border: 2px solid #b3d9ff; }
+        .stat-card h3 { margin: 0 0 10px 0; color: #1a3a5c; font-size: 14px; text-transform: uppercase; }
+        .stat-card .stat-value { font-size: 32px; font-weight: 700; color: #0070cc; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e8f4fc; }
+        .data-table th { background: #f0f8ff; color: #1a3a5c; font-weight: 600; }
+        .data-table tr:hover { background: #f8fafc; }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #fdedec; color: #922b21; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; margin: 2px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-group { flex: 1; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #1a3a5c; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 2px solid #d1e7ff; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="images/logo.png" alt="Logo" style="width: 50px; height: 50px;">
+                <div>
+                    <h1 style="margin: 0; color: #1a3a5c;">Admin Panel</h1>
+                    <p style="margin: 5px 0 0 0; color: #5a6b7c; font-size: 14px;" id="admin-email"></p>
+                </div>
+            </div>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+
+        <div class="admin-nav">
+            <button class="admin-tab-btn active" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('users')">👥 Users</button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('orders')">📦 Orders</button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('kyc')">🔐 KYC Requests</button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('tickets')">🎫 Tickets</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="admin-section active">
+            <h2 style="color: #1a3a5c; margin-bottom: 20px;">Dashboard Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="stat-value" id="stat-users">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Orders</h3>
+                    <div class="stat-value" id="stat-orders">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending KYC</h3>
+                    <div class="stat-value" id="stat-kyc">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Revenue</h3>
+                    <div class="stat-value" id="stat-revenue">-</div>
+                </div>
+            </div>
+            
+            <h3 style="color: #1a3a5c; margin: 30px 0 15px 0;">Recent Activity</h3>
+            <div id="recent-activity"></div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users-section" class="admin-section">
+            <h2 style="color: #1a3a5c; margin-bottom: 20px;">User Management</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>UID</th>
+                        <th>Last Login</th>
+                        <th>KYC Status</th>
+                        <th>Total Orders</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table"></tbody>
+            </table>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="orders-section" class="admin-section">
+            <h2 style="color: #1a3a5c; margin-bottom: 20px;">Order Management</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User</th>
+                        <th>Server</th>
+                        <th>Plan</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table"></tbody>
+            </table>
+        </div>
+
+        <!-- KYC Section -->
+        <div id="kyc-section" class="admin-section">
+            <h2 style="color: #1a3a5c; margin-bottom: 20px;">KYC Verification Requests</h2>
+            <div id="kyc-list"></div>
+        </div>
+
+        <!-- Tickets Section -->
+        <div id="tickets-section" class="admin-section">
+            <h2 style="color: #1a3a5c; margin-bottom: 20px;">Support Tickets</h2>
+            <div id="tickets-list"></div>
+        </div>
+    </div>
+
+    <!-- Order Edit Modal -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: #1a3a5c; margin-bottom: 20px;">Edit Order - <span id="modal-order-id"></span></h2>
+            <form id="order-form" onsubmit="saveOrder(event)">
+                <input type="hidden" id="edit-order-id">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="edit-status" required>
+                            <option value="pending_verification">Pending Verification</option>
+                            <option value="paid">Paid</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 style="color: #1a3a5c; margin: 20px 0 15px 0; font-size: 16px;">Server Specifications</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CPU</label>
+                        <input type="text" id="edit-cpu" placeholder="e.g., 4x Intel Xeon Platinum">
+                    </div>
+                    <div class="form-group">
+                        <label>RAM</label>
+                        <input type="text" id="edit-ram" placeholder="e.g., 64 GB DDR4">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Storage</label>
+                        <input type="text" id="edit-storage" placeholder="e.g., 2x 1 TB NVMe">
+                    </div>
+                    <div class="form-group">
+                        <label>Bandwidth</label>
+                        <input type="text" id="edit-bandwidth" placeholder="e.g., 1 Gbps Unmetered">
+                    </div>
+                </div>
+
+                <h3 style="color: #1a3a5c; margin: 20px 0 15px 0; font-size: 16px;">SSH Access</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>IP Address</label>
+                        <input type="text" id="edit-ssh-ip" placeholder="e.g., 89.45.23.187">
+                    </div>
+                    <div class="form-group">
+                        <label>Port</label>
+                        <input type="text" id="edit-ssh-port" value="22">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="edit-ssh-user" value="root">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="text" id="edit-ssh-pass" placeholder="Enter password">
+                    </div>
+                </div>
+
+                <h3 style="color: #1a3a5c; margin: 20px 0 15px 0; font-size: 16px;">VPN Access</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Config URL</label>
+                        <input type="text" id="edit-vpn-url" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>VPN Username</label>
+                        <input type="text" id="edit-vpn-user" placeholder="vpn_user">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>VPN Password</label>
+                        <input type="text" id="edit-vpn-pass" placeholder="Enter password">
+                    </div>
+                </div>
+
+                <h3 style="color: #1a3a5c; margin: 20px 0 15px 0; font-size: 16px;">Control Panel</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Panel URL</label>
+                        <input type="text" id="edit-panel-url" placeholder="https://...:8443">
+                    </div>
+                    <div class="form-group">
+                        <label>Panel Username</label>
+                        <input type="text" id="edit-panel-user" placeholder="admin">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Panel Password</label>
+                        <input type="text" id="edit-panel-pass" placeholder="Enter password">
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        const ADMIN_EMAIL = 'interserverusa@gmail.com';
+
+        auth.onAuthStateChanged((user) => {
+            if (!user || user.email !== ADMIN_EMAIL) {
+                alert('Access Denied! Admin only.');
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('admin-email').textContent = user.email;
+                loadDashboard();
+            }
+        });
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabName + '-section').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard') loadDashboard();
+            else if (tabName === 'users') loadUsers();
+            else if (tabName === 'orders') loadOrders();
+            else if (tabName === 'kyc') loadKYC();
+            else if (tabName === 'tickets') loadTickets();
+        }
+
+        async function loadDashboard() {
+            try {
+                const usersSnap = await db.collection('users').get();
+                const ordersSnap = await db.collection('orders').get();
+                const kycSnap = await db.collection('kyc_requests').where('status', '==', 'pending').get();
+                
+                let totalRevenue = 0;
+                ordersSnap.forEach(doc => {
+                    totalRevenue += doc.data().price || 0;
+                });
+
+                document.getElementById('stat-users').textContent = usersSnap.size;
+                document.getElementById('stat-orders').textContent = ordersSnap.size;
+                document.getElementById('stat-kyc').textContent = kycSnap.size;
+                document.getElementById('stat-revenue').textContent = '$' + totalRevenue.toLocaleString();
+
+                // Recent activity
+                const recentHtml = ordersSnap.docs.slice(0, 5).map(doc => {
+                    const order = doc.data();
+                    return `<div style="padding: 10px; border-left: 3px solid #0070cc; background: #f8fafc; margin-bottom: 10px;">
+                        <strong>${order.serverName || 'Server'}</strong> - ${order.userEmail} - $${order.price}
+                    </div>`;
+                }).join('');
+                document.getElementById('recent-activity').innerHTML = recentHtml || '<p>No recent activity</p>';
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const usersSnap = await db.collection('users').get();
+                const ordersSnap = await db.collection('orders').get();
+                
+                const userOrders = {};
+                ordersSnap.forEach(doc => {
+                    const uid = doc.data().userId;
+                    userOrders[uid] = (userOrders[uid] || 0) + 1;
+                });
+
+                const tbody = document.getElementById('users-table');
+                tbody.innerHTML = usersSnap.docs.map(doc => {
+                    const user = doc.data();
+                    const uid = doc.id;
+                    const kycStatus = user.kycStatus || 'unverified';
+                    
+                    return `<tr>
+                        <td>${user.email || 'N/A'}</td>
+                        <td style="font-size: 12px; font-family: monospace;">${uid.substring(0, 8)}...</td>
+                        <td>${user.lastLogin ? new Date(user.lastLogin.seconds * 1000).toLocaleString() : 'Never'}</td>
+                        <td><span class="badge ${kycStatus === 'approved' ? 'badge-success' : kycStatus === 'pending' ? 'badge-warning' : 'badge-danger'}">${kycStatus.toUpperCase()}</span></td>
+                        <td>${userOrders[uid] || 0}</td>
+                        <td>
+                            <button onclick="viewUserDetails('${uid}')" class="btn-primary btn-sm">View</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                const snapshot = await db.collection('orders').orderBy('timestamp', 'desc').get();
+                const tbody = document.getElementById('orders-table');
+                
+                tbody.innerHTML = snapshot.docs.map(doc => {
+                    const order = doc.data();
+                    const date = order.timestamp ? order.timestamp.toDate().toLocaleDateString() : 'N/A';
+                    
+                    return `<tr>
+                        <td style="font-size: 12px;">${doc.id.substring(0, 8)}...</td>
+                        <td>${order.userEmail || 'N/A'}</td>
+                        <td>${order.serverName || 'N/A'}</td>
+                        <td>${order.plan || 'N/A'}</td>
+                        <td>$${order.price ? order.price.toLocaleString() : '0'}</td>
+                        <td><span class="badge ${order.status === 'completed' ? 'badge-success' : order.status === 'paid' ? 'badge-info' : 'badge-warning'}">${order.status.replace('_', ' ').toUpperCase()}</span></td>
+                        <td>${date}</td>
+                        <td>
+                            <button onclick="editOrder('${doc.id}')" class="btn-primary btn-sm">Edit</button>
+                            ${order.status !== 'completed' ? `<button onclick="completeOrder('${doc.id}')" class="btn-secondary btn-sm">Complete</button>` : ''}
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        async function loadKYC() {
+            try {
+                const snapshot = await db.collection('kyc_requests').where('status', '==', 'pending').get();
+                const container = document.getElementById('kyc-list');
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">No pending KYC requests</p>';
+                    return;
+                }
+
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const kyc = doc.data();
+                    return `<div style="border: 2px solid #e0eafc; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <h3 style="margin: 0;">${kyc.firstName} ${kyc.lastName}</h3>
+                            <span class="badge badge-warning">PENDING</span>
+                        </div>
+                        <p><strong>Email:</strong> ${kyc.email}</p>
+                        <p><strong>Country:</strong> ${kyc.country} (${kyc.countryCode})</p>
+                        <p><strong>Phone:</strong> ${kyc.phoneCode} ${kyc.phoneNumber}</p>
+                        <p><strong>ID Number:</strong> ${kyc.idNumber}</p>
+                        <p><strong>Address:</strong> ${kyc.address}, ${kyc.city}, ${kyc.province} ${kyc.postalCode}</p>
+                        <div style="margin-top: 15px;">
+                            <button onclick="approveKYC('${doc.id}', '${kyc.userId}')" class="btn-primary btn-sm">✅ Approve</button>
+                            <button onclick="rejectKYC('${doc.id}', '${kyc.userId}')" class="btn-secondary btn-sm">❌ Reject</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading KYC:', error);
+            }
+        }
+
+        async function loadTickets() {
+            try {
+                const snapshot = await db.collection('tickets').orderBy('createdAt', 'desc').get();
+                const container = document.getElementById('tickets-list');
+                
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const ticket = doc.data();
+                    const date = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString() : 'N/A';
+                    
+                    return `<div style="border: 2px solid #e0eafc; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <h3 style="margin: 0;">${ticket.subject}</h3>
+                            <span class="badge ${ticket.status === 'open' ? 'badge-warning' : 'badge-info'}">${ticket.status.toUpperCase()}</span>
+                        </div>
+                        <p><strong>Ticket #:</strong> ${ticket.ticketNumber}</p>
+                        <p><strong>User:</strong> ${ticket.userEmail}</p>
+                        <p><strong>Priority:</strong> ${ticket.priority.toUpperCase()}</p>
+                        <p><strong>Created:</strong> ${date}</p>
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                            <strong>Message:</strong><br>${ticket.message}
+                        </div>
+                        ${ticket.adminReply ? `<div style="background: #e8f6f3; padding: 15px; border-radius: 6px; margin: 15px 0;"><strong>Your Reply:</strong><br>${ticket.adminReply}</div>` : ''}
+                        <div style="margin-top: 15px;">
+                            <textarea id="reply-${doc.id}" rows="3" placeholder="Type your reply..." style="width: 100%; padding: 10px; border: 2px solid #d1e7ff; border-radius: 6px; margin-bottom: 10px;"></textarea>
+                            <button onclick="replyTicket('${doc.id}')" class="btn-primary btn-sm">📤 Send Reply</button>
+                            <button onclick="resolveTicket('${doc.id}')" class="btn-secondary btn-sm">✅ Mark Resolved</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+            }
+        }
+
+        // Order Management Functions
+        function editOrder(orderId) {
+            db.collection('orders').doc(orderId).get().then(doc => {
+                if (doc.exists) {
+                    const order = doc.data();
+                    document.getElementById('edit-order-id').value = orderId;
+                    document.getElementById('modal-order-id').textContent = orderId.substring(0, 8);
+                    document.getElementById('edit-status').value = order.status || 'pending_verification';
+                    document.getElementById('edit-cpu').value = order.serverCpu || '';
+                    document.getElementById('edit-ram').value = order.serverRam || '';
+                    document.getElementById('edit-storage').value = order.serverStorage || '';
+                    document.getElementById('edit-bandwidth').value = order.serverBandwidth || '';
+                    document.getElementById('edit-ssh-ip').value = order.sshIp || '';
+                    document.getElementById('edit-ssh-port').value = order.sshPort || '22';
+                    document.getElementById('edit-ssh-user').value = order.sshUser || 'root';
+                    document.getElementById('edit-ssh-pass').value = order.sshPass || '';
+                    document.getElementById('edit-vpn-url').value = order.vpnUrl || '';
+                    document.getElementById('edit-vpn-user').value = order.vpnUser || '';
+                    document.getElementById('edit-vpn-pass').value = order.vpnPass || '';
+                    document.getElementById('edit-panel-url').value = order.panelUrl || '';
+                    document.getElementById('edit-panel-user').value = order.panelUser || '';
+                    document.getElementById('edit-panel-pass').value = order.panelPass || '';
+                    
+                    document.getElementById('order-modal').classList.add('active');
+                }
+            });
+        }
+
+        async function saveOrder(event) {
+            event.preventDefault();
+            const orderId = document.getElementById('edit-order-id').value;
+            
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    status: document.getElementById('edit-status').value,
+                    serverCpu: document.getElementById('edit-cpu').value,
+                    serverRam: document.getElementById('edit-ram').value,
+                    serverStorage: document.getElementById('edit-storage').value,
+                    serverBandwidth: document.getElementById('edit-bandwidth').value,
+                    sshIp: document.getElementById('edit-ssh-ip').value,
+                    sshPort: document.getElementById('edit-ssh-port').value,
+                    sshUser: document.getElementById('edit-ssh-user').value,
+                    sshPass: document.getElementById('edit-ssh-pass').value,
+                    vpnUrl: document.getElementById('edit-vpn-url').value,
+                    vpnUser: document.getElementById('edit-vpn-user').value,
+                    vpnPass: document.getElementById('edit-vpn-pass').value,
+                    panelUrl: document.getElementById('edit-panel-url').value,
+                    panelUser: document.getElementById('edit-panel-user').value,
+                    panelPass: document.getElementById('edit-panel-pass').value
+                });
+                
+                alert('Order updated successfully!');
+                closeModal();
+                loadOrders();
+            } catch (error) {
+                console.error('Error saving order:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function completeOrder(orderId) {
+            if (confirm('Mark this order as completed?')) {
+                await db.collection('orders').doc(orderId).update({ status: 'completed' });
+                loadOrders();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('order-modal').classList.remove('active');
+        }
+
+        // KYC Management Functions
+        async function approveKYC(requestId, userId) {
+            if (confirm('Approve this KYC request?')) {
+                await db.collection('kyc_requests').doc(requestId).update({ status: 'approved' });
+                await db.collection('users').doc(userId).update({ kycStatus: 'approved' });
+                alert('KYC approved!');
+                loadKYC();
+            }
+        }
+
+        async function rejectKYC(requestId, userId) {
+            if (confirm('Reject this KYC request?')) {
+                await db.collection('kyc_requests').doc(requestId).update({ status: 'rejected' });
+                await db.collection('users').doc(userId).update({ kycStatus: 'rejected' });
+                alert('KYC rejected!');
+                loadKYC();
+            }
+        }
+
+        // Ticket Management Functions
+        async function replyTicket(ticketId) {
+            const reply = document.getElementById(`reply-${ticketId}`).value.trim();
+            if (!reply) {
+                alert('Please enter a reply message.');
+                return;
+            }
+            
+            try {
+                await db.collection('tickets').doc(ticketId).update({
+                    adminReply: reply,
+                    repliedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'replied'
+                });
+                alert('Reply sent!');
+                loadTickets();
+            } catch (error) {
+                console.error('Error sending reply:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function resolveTicket(ticketId) {
+            if (confirm('Mark this ticket as resolved?')) {
+                await db.collection('tickets').doc(ticketId).update({
+                    status: 'resolved',
+                    resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                loadTickets();
+            }
+        }
+
+        function viewUserDetails(uid) {
+            alert('User details view coming soon... UID: ' + uid);
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }
+    </script>
+</body>
+</html>
